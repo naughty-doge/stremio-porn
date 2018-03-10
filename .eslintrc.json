@@ -1,0 +1,151 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:import/errors"
+  ],
+  "plugins": [
+    "import"
+  ],
+  "env": {
+    "es6": true,
+    "node": true,
+    "mocha": true
+  },
+  "rules": {
+    "no-constant-condition": "off",
+    "no-empty": ["error", {
+      "allowEmptyCatch": true
+    }],
+    "strict": "error",
+    "array-callback-return": "error",
+    "curly": "error",
+    "dot-location": ["error", "property"],
+    "eqeqeq": "error",
+    "no-alert": "error",
+    "no-caller": "error",
+    "no-eval": "error",
+    "no-extend-native": "error",
+    "no-floating-decimal": "error",
+    "no-implicit-globals": "error",
+    "no-implicit-coercion": "error",
+    "no-implied-eval": "error",
+    "no-iterator": "error",
+    "no-loop-func": "error",
+    "no-multi-spaces": "error",
+    "no-proto": "error",
+    "no-return-assign": "error",
+    "no-return-await": "error",
+    "no-self-compare": "error",
+    "no-sequences": "error",
+    "no-throw-literal": "error",
+    "no-useless-call": "error",
+    "no-useless-concat": "error",
+    "no-useless-escape": "error",
+    "no-useless-return": "error",
+    "no-void": "error",
+    "no-warning-comments": "warn",
+    "no-with": "error",
+    "prefer-promise-reject-errors": "error",
+    "wrap-iife": "error",
+    "yoda": "error",
+    "no-undef-init": "error",
+    "no-use-before-define": [
+      "error",
+      {
+        "functions": false,
+        "classes": false,
+        "variables": true
+      }
+    ],
+    "global-require": "error",
+    "array-bracket-spacing": "error",
+    "block-spacing": "error",
+    "brace-style": "error",
+    "camelcase": "error",
+    "comma-dangle": ["error", {
+      "arrays": "always-multiline",
+      "objects": "always-multiline",
+      "imports": "never",
+      "exports": "never",
+      "functions": "never"
+    }],
+    "comma-spacing": "error",
+    "comma-style": "error",
+    "computed-property-spacing": "error",
+    "consistent-this": ["error", "self"],
+    "eol-last": "error",
+    "func-call-spacing": "error",
+    "indent": ["error", 2, {
+      "SwitchCase": 1
+    }],
+    "jsx-quotes": "error",
+    "key-spacing": "error",
+    "keyword-spacing": "error",
+    "linebreak-style": "error",
+    "lines-around-directive": "error",
+    "max-depth": ["error", 4],
+    "max-len": ["error", {
+      "code": 80,
+      "ignoreStrings": true
+    }],
+    "max-params": ["error", 5],
+    "new-cap": "error",
+    "new-parens": "error",
+    "no-lonely-if": "error",
+    "no-mixed-operators": "error",
+    "no-multi-assign": "error",
+    "no-multiple-empty-lines": ["error", {
+      "max": 2,
+      "maxEOF": 0
+    }],
+    "no-nested-ternary": "error",
+    "no-tabs": "error",
+    "no-trailing-spaces": "error",
+    "no-unneeded-ternary": "error",
+    "no-whitespace-before-property": "error",
+    "object-curly-spacing": ["error", "always"],
+    "one-var-declaration-per-line": "error",
+    "operator-linebreak": ["error", "after"],
+    "quote-props": ["error", "as-needed"],
+    "quotes": ["error", "single"],
+    "semi": ["error", "never"],
+    "space-before-blocks": ["error", "always"],
+    "space-before-function-paren": ["error", {
+      "anonymous": "never",
+      "named": "never",
+      "asyncArrow": "always"
+    }],
+    "space-in-parens": "error",
+    "space-infix-ops": "error",
+    "space-unary-ops": ["error", {
+      "words": true,
+      "nonwords": false
+    }],
+    "spaced-comment": "error",
+    "template-tag-spacing": "error",
+    "unicode-bom": "error",
+    "arrow-parens": "error",
+    "arrow-spacing": "error",
+    "generator-star-spacing": ["error", "after"],
+    "no-class-assign": "error",
+    "no-confusing-arrow": "error",
+    "no-duplicate-imports": "error",
+    "no-new-symbol": "error",
+    "no-useless-computed-key": "error",
+    "no-useless-constructor": "error",
+    "no-var": "error",
+    "prefer-arrow-callback": ["error", {
+      "allowNamedFunctions": true
+    }],
+    "prefer-rest-params": "error",
+    "prefer-template": "error",
+    "rest-spread-spacing": "error",
+    "symbol-description": "error",
+    "template-curly-spacing": "error",
+    "yield-star-spacing": "error",
+    "import/newline-after-import": ["error", {
+      "count": 2
+    }],
+    "import/order": ["error"]
+  }
+}
