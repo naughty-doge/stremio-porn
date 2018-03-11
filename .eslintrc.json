@@ -6,6 +6,12 @@
   "plugins": [
     "import"
   ],
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 7,
+    "sourceType": "module",
+    "codeFrame": false
+  },
   "env": {
     "es6": true,
     "node": true,
@@ -16,7 +22,6 @@
     "no-empty": ["error", {
       "allowEmptyCatch": true
     }],
-    "strict": "error",
     "array-callback-return": "error",
     "curly": "error",
     "dot-location": ["error", "property"],
