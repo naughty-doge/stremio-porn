@@ -55,7 +55,7 @@
   },
   "dependencies": {
     "cross-env": "^5.1.4",
-    "source-map-support": "^0.5.3",
+    "got": "^8.3.0",
     "stremio-addons": "^2.8.14"
   }
 }
