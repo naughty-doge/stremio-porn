@@ -4,10 +4,10 @@ import RedTube from './adapters/RedTube'
 const ID = 'porn_id'
 const PROP_PREFIX = 'porn.'
 const ADAPTERS = [RedTube]
-const SORTS = ADAPTERS.map(({ name, contentTypes }) => ({
+const SORTS = ADAPTERS.map(({ name, SUPPORTED_TYPES }) => ({
   name,
   prop: `${PROP_PREFIX}${name}`,
-  types: contentTypes,
+  types: SUPPORTED_TYPES,
 }))
 
 

@@ -8,7 +8,7 @@ const MANIFEST = {
   id: 'org.stremio.porn',
   version: '0.0.0',
   description: 'Time to unsheathe your sword!',
-  types: ['movie', 'series', 'tv'],
+  types: ['movie', 'series', 'channel', 'tv'],
   idProperty: PornClient.ID,
   dontAnnounce: process.env.NODE_ENV === 'production',
   sorts: PornClient.SORTS,
@@ -17,14 +17,18 @@ const MANIFEST = {
 }
 
 
-let toStremioEndpoint = (fn) => {
-  return (request, cb, user) => {
+function makeEndpoint(name, fn) {
+  return async (request, cb, user) => {
     fn(request, user).then(
       (result) => cb(null, result),
       (err) => {
         /* eslint-disable no-console */
-        console.error(err)
+        console.error(
+          'An error has occurred while processing ' +
+          `the following request to ${name}:`
+        )
         console.error(request)
+        console.error(err)
         cb(err)
       }
     )
@@ -33,16 +37,21 @@ let toStremioEndpoint = (fn) => {
 
 let client = new PornClient()
 let methods = {
-  'stream.find': toStremioEndpoint((req) => client.getStreams(req)),
-  'meta.find': toStremioEndpoint((req) => client.find(req)),
-  'meta.get': toStremioEndpoint((req) => client.getItem(req)),
-  'meta.search': toStremioEndpoint((req) => client.search(req)),
-  'meta.genres': (request, cb) => {
-    console.log('meta.genres')
-    console.log(request)
-    cb()
-    // cb expects array of strings (genres)
-  },
+  'stream.find': makeEndpoint('stream.find', (req) => {
+    return client.getStreams(req)
+  }),
+  'meta.find': makeEndpoint('meta.find', (req) => {
+    return client.find(req)
+  }),
+  'meta.get': makeEndpoint('meta.get', (req) => {
+    return client.getItem(req)
+  }),
+  'meta.search': makeEndpoint('meta.search', (req) => {
+    return client.search(req)
+  }),
+  'meta.genres': makeEndpoint('meta.genres', () => {
+    throw new Error('Not implemented')
+  }),
 }
 
 
