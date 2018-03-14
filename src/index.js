@@ -10,7 +10,7 @@ const MANIFEST = {
   description: 'Time to unsheathe your sword!',
   types: ['movie', 'series', 'channel', 'tv'],
   idProperty: PornClient.ID,
-  dontAnnounce: process.env.NODE_ENV === 'production',
+  dontAnnounce: process.env.NODE_ENV !== 'production',
   sorts: PornClient.SORTS,
   // icon: 'URL to 256x256 monochrome png icon',
   // background: 'URL to 1366x756 png background',
