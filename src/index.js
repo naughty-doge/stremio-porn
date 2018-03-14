@@ -35,27 +35,26 @@ function makeEndpoint(name, fn) {
   }
 }
 
-let client = new PornClient()
-let methods = {
-  'stream.find': makeEndpoint('stream.find', (req) => {
-    return client.getStreams(req)
-  }),
-  'meta.find': makeEndpoint('meta.find', (req) => {
-    return client.find(req)
-  }),
-  'meta.get': makeEndpoint('meta.get', (req) => {
-    return client.getItem(req)
-  }),
-  'meta.search': makeEndpoint('meta.search', (req) => {
-    return client.search(req)
-  }),
-  'meta.genres': makeEndpoint('meta.genres', () => {
-    throw new Error('Not implemented')
-  }),
+function methodsToEndpoints(methods) {
+  return Object.keys(methods).reduce((endpoints, name) => {
+    endpoints[name] = makeEndpoint(name, methods[name])
+    return endpoints
+  }, {})
 }
 
 
-let addon = new Stremio.Server(methods, MANIFEST)
+let client = new PornClient()
+let methods = {
+  'stream.find': (req) => client.getStreams(req),
+  'meta.find': (req) => client.find(req),
+  'meta.get': (req) => client.getItem(req),
+  'meta.search': (req) => client.search(req),
+  'meta.genres': (req) => client.getGenres(req),
+}
+let endpoints = methodsToEndpoints(methods)
+
+
+let addon = new Stremio.Server(endpoints, MANIFEST)
 let server = http.createServer((req, res) => {
   addon.middleware(req, res, () => res.end())
 })
