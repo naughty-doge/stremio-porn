@@ -1,4 +1,6 @@
 function paginate(itemsPerPage, skip, limit) {
+  skip = skip || 0
+  limit = (!limit || limit === Infinity) ? itemsPerPage : limit
   let firstPage = Math.ceil((skip + 0.1) / itemsPerPage) || 1
   let pageCount = Math.ceil(limit / itemsPerPage)
   let pages = []
@@ -17,8 +19,12 @@ function paginate(itemsPerPage, skip, limit) {
 class PornAdapter {
   static SUPPORTED_TYPES = []
 
-  _convertItemToMetaElement(item) {
+  _normalizeItemResult(item) {
     return item
+  }
+
+  _normalizeStreamResult(stream) {
+    return stream
   }
 
   async find(request) {
@@ -44,10 +50,11 @@ class PornAdapter {
       results = await this._findBySkipLimit(query, skip, limit)
     }
 
-    return results.map((item) => this._convertItemToMetaElement(item))
+    return results.map((item) => this._normalizeItemResult(item))
   }
 
-  async getItem(type, id) {
+  async getItem(request) {
+    let { type, id } = request.query
     let { SUPPORTED_TYPES } = this.constructor
 
     if (!SUPPORTED_TYPES.includes(type)) {
@@ -55,11 +62,19 @@ class PornAdapter {
     }
 
     let result = await this._getItem(type, id)
-    return result ? this._convertItemToMetaElement(result) : undefined
+    return result ? [this._normalizeItemResult(result)] : []
   }
 
-  async getStreams(type, id) {
-    return this._getStreams(type, id)
+  async getStreams(request) {
+    let { type, id } = request.query
+    let { SUPPORTED_TYPES } = this.constructor
+
+    if (!SUPPORTED_TYPES.includes(type)) {
+      throw new Error(`Content type ${type} is not supported`)
+    }
+
+    let results = await this._getStreams(type, id)
+    return results.map((stream) => this._normalizeStreamResult(stream))
   }
 }
 

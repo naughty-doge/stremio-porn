@@ -29,6 +29,7 @@ function makeEndpoint(name, fn) {
         )
         console.error(request)
         console.error(err)
+        /* eslint-enable no-console */
         cb(err)
       }
     )
@@ -47,8 +48,8 @@ let client = new PornClient()
 let methods = {
   'stream.find': (req) => client.getStreams(req),
   'meta.find': (req) => client.find(req),
+  'meta.search': (req) => client.find(req),
   'meta.get': (req) => client.getItem(req),
-  'meta.search': (req) => client.search(req),
   'meta.genres': (req) => client.getGenres(req),
 }
 let endpoints = methodsToEndpoints(methods)
@@ -61,6 +62,7 @@ let server = http.createServer((req, res) => {
 
 server
   .on('listening', () => {
+    // eslint-disable-next-line no-console
     console.log(`Porn Addon is listening on port ${server.address().port}`)
   })
   .listen(process.env.PORT || 8008)
