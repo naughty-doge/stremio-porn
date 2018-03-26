@@ -1,6 +1,4 @@
 function paginate(itemsPerPage, skip, limit) {
-  skip = skip || 0
-  limit = (!limit || limit === Infinity) ? itemsPerPage : limit
   let firstPage = Math.ceil((skip + 0.1) / itemsPerPage) || 1
   let pageCount = Math.ceil(limit / itemsPerPage)
   let pages = []
@@ -27,25 +25,22 @@ class PornAdapter {
     return stream
   }
 
-  async find(request) {
+  async find(request = {}) {
     let { SUPPORTED_TYPES, ITEMS_PER_PAGE } = this.constructor
-    let { query, skip, limit } = request
+    let { query = {}, skip, limit } = request
     let results
-
-    if (typeof query === 'string') {
-      query = {
-        search: query,
-      }
-    }
 
     if (query.type && !SUPPORTED_TYPES.includes(query.type)) {
       throw new Error(`Content type ${query.type} is not supported`)
     }
 
+    skip = skip || 0
+    limit = (!limit || limit === Infinity) ? ITEMS_PER_PAGE : limit
+
     if (this._findByPages) {
       let { pages, skipOnFirstPage } = paginate(ITEMS_PER_PAGE, skip, limit)
       results = await this._findByPages(query, pages)
-      results = results.slice(skipOnFirstPage, limit)
+      results = results.slice(skipOnFirstPage, skipOnFirstPage + limit)
     } else {
       results = await this._findBySkipLimit(query, skip, limit)
     }

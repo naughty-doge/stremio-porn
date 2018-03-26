@@ -26,7 +26,7 @@ class RedTube extends PornAdapter {
     return {
       type: 'movie',
       id: video.video_id,
-      name: video.title,
+      name: video.title.trim(),
       genre: tags,
       banner: video.thumb,
       poster: video.thumb,
@@ -45,7 +45,7 @@ class RedTube extends PornAdapter {
       ...stream,
       availability: 1,
       isFree: 1,
-      title: stream.title || 'SD',
+      title: stream.title.trim() || 'SD',
     }
   }
 
@@ -102,6 +102,30 @@ class RedTube extends PornAdapter {
     return this._requestApi(query)
   }
 
+  _parseEmbeddedVideoPage(body) {
+    /* eslint-disable max-len */
+    // URL example:
+    // https://ce.rdtcdn.com/media/videos/201803/12/4930561/480P_600K_4930561.mp4?a5dcae8e1adc0bdaed975f0...
+    let regexp = /videoUrl"?\s*:\s*"?(https?:\\?\/\\?\/[a-z]+\.rdtcdn\.com[^"]+)/gi
+    /* eslint-enable max-len */
+    let urlMatches = regexp.exec(body)
+
+    if (!urlMatches || !urlMatches[1]) {
+      throw new Error(
+        'Unable to extract a stream URL from an embedded video page'
+      )
+    }
+
+    let url = urlMatches[1]
+      .replace(/[\\/]+/g, '/') // Normalize the slashes...
+      .replace(/(https?:\/)/, '$1/') // ...but keep the // after "https:"
+    let fileName = url.split('/').pop().split('?')[0]
+    let qualityMatches = fileName.match(/\d+p/i)
+    let quality = qualityMatches && qualityMatches[0].toLowerCase()
+
+    return { url, quality }
+  }
+
   async _getStreams(type, id) {
     let options = {
       headers: REQUEST_HEADERS,
@@ -115,26 +139,7 @@ class RedTube extends PornAdapter {
       )
     }
 
-    /* eslint-disable max-len */
-    // URL example:
-    // https://ce.rdtcdn.com/media/videos/201803/12/4930561/480P_600K_4930561.mp4?a5dcae8e1adc0bdaed975f0...
-    let regexp = /videoUrl"?\s*:\s*"?(https?:\\?\/\\?\/[a-z]+\.rdtcdn\.com[^"]+)/gi
-    /* eslint-enable max-len */
-    let urlMatches = regexp.exec(body)
-
-    if (!urlMatches || !urlMatches[1]) {
-      throw new Error(
-        `Unable to extract a stream URL from ${EMBED_URL}?id=${id}`
-      )
-    }
-
-    let url = urlMatches[1]
-      .replace(/[\\/]+/g, '/') // Normalize the slashes...
-      .replace(/(https?:\/)/, '$1/') // ...but keep the // after "https:"
-    let fileName = url.split('/').pop().split('?')[0]
-    let qualityMatches = fileName.match(/\d+p/i)
-    let quality = qualityMatches && qualityMatches[0].toLowerCase()
-
+    let { url, quality } = this._parseEmbeddedVideoPage(body)
     return [{ id, url, title: quality }]
   }
 }

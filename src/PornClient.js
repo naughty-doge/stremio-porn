@@ -58,11 +58,7 @@ function normalizeRequest(request) {
     query.id = id
   }
 
-  return {
-    query, adapters,
-    limit: limit || Infinity,
-    skip: skip || 0,
-  }
+  return { query, adapters, skip, limit }
 }
 
 function normalizeResult(adapter, item, idProp = 'id') {
