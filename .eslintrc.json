@@ -1,10 +1,8 @@
 {
   "extends": [
     "eslint:recommended",
-    "plugin:import/errors"
-  ],
-  "plugins": [
-    "import"
+    "plugin:import/errors",
+    "plugin:jest/recommended"
   ],
   "parser": "babel-eslint",
   "parserOptions": {
@@ -15,7 +13,7 @@
   "env": {
     "es6": true,
     "node": true,
-    "mocha": true
+    "jest": true
   },
   "rules": {
     "no-constant-condition": "off",
