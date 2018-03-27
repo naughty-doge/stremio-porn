@@ -85,18 +85,21 @@ class PornClient {
   _getAdaptersForRequest(request) {
     let { query, adapters } = request
     let type = query && query.type
+    let matchingAdapters = this.adapters
 
-    if (!adapters.length) {
-      return this.adapters
+    if (adapters.length) {
+      matchingAdapters = matchingAdapters.filter((adapter) => {
+        return adapters.includes(adapter.constructor.name)
+      })
     }
 
-    return this.adapters.filter((adapter) => {
-      let adapterClass = adapter.constructor
-      return (
-        adapters.includes(adapterClass.name) &&
-        (!type || adapterClass.SUPPORTED_TYPES.includes(type))
-      )
-    })
+    if (type) {
+      matchingAdapters = matchingAdapters.filter((adapter) => {
+        return adapter.constructor.SUPPORTED_TYPES.includes(type)
+      })
+    }
+
+    return matchingAdapters
   }
 
   async _invokeMethod(method, rawRequest, idProp) {
