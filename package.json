@@ -7,8 +7,9 @@
     "dev": "cross-env NODE_ENV=development node dist/index.js",
     "prod": "cross-env NODE_ENV=production node dist/index.js",
     "build": "rimraf dist/**/* && babel src -d dist --source-maps",
-    "test": "jest --testNamePattern=\"^(?!.*@integration).*$\"",
-    "test-all": "jest",
+    "test-unit": "jest --testNamePattern=\"^(?!.*@integration).*$\"",
+    "test-integration": "jest --testNamePattern=\"^.*@integration.*$\"",
+    "test": "jest",
     "precommit": "lint-staged"
   },
   "lint-staged": {
