@@ -63,6 +63,7 @@
     "rimraf": "^2.6.2"
   },
   "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
     "cross-env": "^5.1.4",
     "got": "^8.3.0",
     "stremio-addons": "^2.8.14"
