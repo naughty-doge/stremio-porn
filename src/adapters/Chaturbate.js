@@ -73,7 +73,10 @@ class Chaturbate extends PornAdapter {
   async _findByPage(query, page) {
     let options = {
       headers: REQUEST_HEADERS,
-      query: { page },
+      query: {
+        page,
+        keywords: query.search,
+      },
     }
     let url = query.genre ? `${BASE_URL}/tag/${query.genre}` : BASE_URL
     let { body } = await got(url, options)
