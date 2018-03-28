@@ -6,20 +6,25 @@ import Chaturbate from '../../../src/adapters/Chaturbate'
 const LIST_PAGE = readFileSync(`${__dirname}/listPage.html`)
 const ITEM_PAGE = readFileSync(`${__dirname}/itemPage.html`)
 
-
-const items = [{
+const ITEMS = [{
   id: 'minksky',
   type: 'tv',
-  name: 'minksky',
+  streams: true,
+  match: {
+    name: 'minksky',
+  },
 }, {
   id: 'fuckable_18',
   type: 'tv',
-  name: 'fuckable_18',
+  streams: true,
+  match: {
+    name: 'fuckable_18',
+  },
 }]
 
 
 describe('Chaturbate', () => {
-  testAdapter(Chaturbate, items)
+  testAdapter(Chaturbate, ITEMS)
 
   describe('#_parseItemPage()', () => {
     test('retrieves the item object from the sample item page', () => {

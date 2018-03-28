@@ -1,15 +1,19 @@
 function testAdapter(AdapterClass, items = []) {
   describe('@integration', () => {
+    let adapter
+
+    beforeEach(() => {
+      adapter = new AdapterClass()
+    })
+
     describe('#find()', () => {
       test('when no request query is provided, returns trending items', async () => {
-        let adapter = new AdapterClass()
         let results = await adapter.find()
 
         expect(results).toHaveLength(AdapterClass.ITEMS_PER_PAGE)
       })
 
       test('when a search string is provided, returns matching items', async () => {
-        let adapter = new AdapterClass()
         // Any respected porn site has more than 3 items matching 'deep'
         let search = 'deep'
         let limit = 3
@@ -21,24 +25,31 @@ function testAdapter(AdapterClass, items = []) {
 
     describe('#getItem()', () => {
       items
-        .filter((item) => item.name)
-        .forEach(({ id, type, name }) => {
-          test(`works for ${type} ${id}`, async () => {
-            let adapter = new AdapterClass()
+        .filter((item) => item.match)
+        .forEach(({ id, type, match }) => {
+          test(`retrieves ${type} ${id}`, async () => {
             let query = { type, id }
             let [result] = await adapter.getItem({ query })
 
-            expect(result.name).toBe(name)
+            expect(result).toMatchObject(match)
           })
         })
     })
 
     describe('#getStreams()', () => {
       items
-        .filter((item) => item.streams && item.streams.length)
+        .filter((item) => item.streams === true)
+        .forEach(({ id, type }) => {
+          test(`doesn't throw for ${type} ${id}`, async () => {
+            let query = { type, id }
+            return adapter.getStreams({ query })
+          })
+        })
+
+      items
+        .filter((item) => Array.isArray(item.streams))
         .forEach(({ id, type, streams }) => {
-          test(`works for ${type} ${id}`, async () => {
-            let adapter = new AdapterClass()
+          test(`retrieves streams for ${type} ${id}`, async () => {
             let query = { type, id }
             let results = await adapter.getStreams({ query })
 

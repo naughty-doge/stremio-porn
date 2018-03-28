@@ -5,22 +5,25 @@ import RedTube from '../../../src/adapters/RedTube'
 
 const EMBEDDED_VIDEO_PAGE = readFileSync(`${__dirname}/embeddedVideoPage.html`)
 
-
-const items = [{
+const ITEMS = [{
   id: 1,
   type: 'movie',
-  name: 'Heather taking it deep again',
   streams: ['201208/31/1/480p_600k_1.mp4'],
+  match: {
+    name: 'Heather taking it deep again',
+  },
 }, {
   id: 4848071,
   type: 'movie',
-  name: 'Brother Caught Redhead Step-Sister Masturbate and Fuck Anal',
   streams: ['201803/08/4848071/480P_600K_4848071.mp4'],
+  match: {
+    name: 'Brother Caught Redhead Step-Sister Masturbate and Fuck Anal',
+  },
 }]
 
 
 describe('RedTube', () => {
-  testAdapter(RedTube, items)
+  testAdapter(RedTube, ITEMS)
 
   describe('#_parseEmbeddedVideoPage()', () => {
     test('retrieves a stream from a sample embedded video page', () => {
