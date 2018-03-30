@@ -1,10 +1,11 @@
+import PornHub from './adapters/PornHub'
 import RedTube from './adapters/RedTube'
 import Chaturbate from './adapters/Chaturbate'
 
 
 const ID = 'porn_id'
 const SORT_PROP_PREFIX = 'porn.'
-const ADAPTERS = [RedTube, Chaturbate]
+const ADAPTERS = [PornHub, RedTube, Chaturbate]
 const SORTS = ADAPTERS.map(({ name, SUPPORTED_TYPES }) => ({
   name,
   prop: `${SORT_PROP_PREFIX}${name}`,
