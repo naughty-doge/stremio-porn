@@ -25,6 +25,14 @@ class PornAdapter {
     return stream
   }
 
+  async _findByPages(query, pages) {
+    let requests = pages.map((page) => {
+      return this._findByPage(query, page)
+    })
+    let results = await Promise.all(requests)
+    return [].concat(...results)
+  }
+
   async find(request = {}) {
     let { SUPPORTED_TYPES, ITEMS_PER_PAGE } = this.constructor
     let { query = {}, skip, limit } = request

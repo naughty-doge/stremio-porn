@@ -83,14 +83,6 @@ class Chaturbate extends PornAdapter {
     return this._parseListPage(body)
   }
 
-  async _findByPages(query, pages) {
-    let requests = pages.map((page) => {
-      return this._findByPage(query, page)
-    })
-    let results = await Promise.all(requests)
-    return [].concat(...results)
-  }
-
   async _getItem(type, id) {
     let options = {
       headers: REQUEST_HEADERS,

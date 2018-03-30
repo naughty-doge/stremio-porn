@@ -74,7 +74,7 @@ class RedTube extends PornAdapter {
     return body
   }
 
-  async _findVideosByPage(query, page) {
+  async _findByPage(query, page) {
     let newQuery = {
       data: 'redtube.Videos.searchVideos',
       tag: query.genre,
@@ -83,14 +83,6 @@ class RedTube extends PornAdapter {
     }
     let { videos } = await this._requestApi(newQuery)
     return videos
-  }
-
-  async _findByPages(query, pages) {
-    let requests = pages.map((page) => {
-      return this._findVideosByPage(query, page)
-    })
-    let responses = await Promise.all(requests)
-    return [].concat(...responses)
   }
 
   async _getItem(type, id) {
