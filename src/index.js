@@ -48,7 +48,7 @@ let client = new PornClient()
 let methods = {
   'stream.find': (req) => client.getStreams(req),
   'meta.find': (req) => client.find(req),
-  'meta.search': (req) => client.find(req),
+  'meta.search': (req) => client.search(req),
   'meta.get': (req) => client.getItem(req),
   'meta.genres': (req) => client.getGenres(req),
 }

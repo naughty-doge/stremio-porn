@@ -129,6 +129,10 @@ class PornClient {
     return this._invokeMethod('find', rawRequest)
   }
 
+  async search(rawRequest) {
+    return this._invokeMethod('find', rawRequest)
+  }
+
   async getItem(rawRequest) {
     let [result] = await this._invokeMethod('getItem', rawRequest)
     return result
