@@ -1,6 +1,6 @@
 import got from 'got'
 import cheerio from 'cheerio'
-import PornAdapter from './PornAdapter'
+import AdapterBase from '../AdapterBase'
 
 
 const BASE_URL = 'https://chaturbate.com'
@@ -12,7 +12,7 @@ const REQUEST_HEADERS = {
 }
 
 
-class Chaturbate extends PornAdapter {
+class Chaturbate extends AdapterBase {
   static SUPPORTED_TYPES = SUPPORTED_TYPES
   static ITEMS_PER_PAGE = ITEMS_PER_PAGE
 

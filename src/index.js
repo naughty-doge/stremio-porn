@@ -1,6 +1,6 @@
 import http from 'http'
 import Stremio from 'stremio-addons'
-import PornClient from './PornClient'
+import Client from './Client'
 
 
 const MANIFEST = {
@@ -9,9 +9,9 @@ const MANIFEST = {
   version: '0.0.0',
   description: 'Time to unsheathe your sword!',
   types: ['movie', 'series', 'channel', 'tv'],
-  idProperty: PornClient.ID,
+  idProperty: Client.ID,
   dontAnnounce: process.env.NODE_ENV !== 'production',
-  sorts: PornClient.SORTS,
+  sorts: Client.SORTS,
   // icon: 'URL to 256x256 monochrome png icon',
   // background: 'URL to 1366x756 png background',
 }
@@ -44,7 +44,7 @@ function methodsToEndpoints(methods) {
 }
 
 
-let client = new PornClient()
+let client = new Client()
 let methods = {
   'stream.find': (req) => client.getStreams(req),
   'meta.find': (req) => client.find(req),

@@ -1,7 +1,7 @@
 import { URL } from 'url'
 import got from 'got'
 import cheerio from 'cheerio'
-import PornAdapter from './PornAdapter'
+import AdapterBase from '../AdapterBase'
 
 
 const BASE_URL = 'https://www.pornhub.com'
@@ -36,7 +36,7 @@ function formatDuration(seconds) {
 }
 
 
-class PornHub extends PornAdapter {
+class PornHub extends AdapterBase {
   static SUPPORTED_TYPES = SUPPORTED_TYPES
   static ITEMS_PER_PAGE = ITEMS_PER_PAGE
 

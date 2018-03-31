@@ -78,7 +78,7 @@ function mergeResults(results) {
 }
 
 
-class PornClient {
+class Client {
   static ID = ID
   static SORTS = SORTS
 
@@ -148,4 +148,4 @@ class PornClient {
 }
 
 
-export default PornClient
+export default Client

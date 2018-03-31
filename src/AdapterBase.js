@@ -14,7 +14,7 @@ function paginate(itemsPerPage, skip, limit) {
 }
 
 
-class PornAdapter {
+class AdapterBase {
   static SUPPORTED_TYPES = []
 
   _normalizeItemResult(item) {
@@ -82,4 +82,4 @@ class PornAdapter {
 }
 
 
-export default PornAdapter
+export default AdapterBase
