@@ -5,7 +5,9 @@ import AdapterBase from '../AdapterBase'
 
 const BASE_URL = 'https://chaturbate.com'
 const GET_STREAM_URL = 'https://chaturbate.com/get_edge_hls_url_ajax/'
-const ITEMS_PER_PAGE = 72
+// Chaturbate's number of items per page varies from load to load,
+// so this is the minimum number
+const ITEMS_PER_PAGE = 60
 const SUPPORTED_TYPES = ['tv']
 const REQUEST_HEADERS = {
   'user-agent': 'stremio-porn',
