@@ -8,18 +8,27 @@ function testAdapter(AdapterClass, items = []) {
 
     describe('#find()', () => {
       test('when no request query is provided, returns trending items', async () => {
-        let results = await adapter.find()
+        let type = AdapterClass.SUPPORTED_TYPES[0]
+        let results = await adapter.find({
+          query: { type },
+        })
 
         expect(results).toHaveLength(AdapterClass.ITEMS_PER_PAGE)
       })
 
       test('when a search string is provided, returns matching items', async () => {
-        // Any respected porn site has more than 3 items matching 'deep'
         let search = 'deep'
         let limit = 3
-        let results = await adapter.find({ query: { search }, limit })
+        let type = AdapterClass.SUPPORTED_TYPES[0]
+        let results = await adapter.find({
+          query: { search, type },
+          limit,
+        })
 
-        expect(results).toHaveLength(limit)
+        expect(results.length).toBeLessThanOrEqual(limit)
+        results.forEach((result) => {
+          expect(result.id).toBeTruthy()
+        })
       })
     })
 
