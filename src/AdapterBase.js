@@ -33,12 +33,12 @@ class AdapterBase {
     return [].concat(...results)
   }
 
-  async find(request = {}) {
+  async find(request) {
     let { SUPPORTED_TYPES, ITEMS_PER_PAGE } = this.constructor
-    let { query = {}, skip, limit } = request
+    let { query, skip, limit } = request
     let results
 
-    if (query.type && !SUPPORTED_TYPES.includes(query.type)) {
+    if (!SUPPORTED_TYPES.includes(query.type)) {
       throw new Error(`Content type ${query.type} is not supported`)
     }
 
