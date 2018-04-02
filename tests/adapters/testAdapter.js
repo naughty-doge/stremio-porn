@@ -13,7 +13,10 @@ function testAdapter(AdapterClass, items = []) {
           query: { type },
         })
 
-        expect(results).toHaveLength(AdapterClass.ITEMS_PER_PAGE)
+        expect(results.length).toBeGreaterThan(0)
+        results.forEach((result) => {
+          expect(result.id).toBeTruthy()
+        })
       })
 
       test('when a search string is provided, returns matching items', async () => {

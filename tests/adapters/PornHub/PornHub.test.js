@@ -4,7 +4,7 @@ import PornHub from '../../../src/adapters/PornHub'
 
 
 const MOVIE_LIST_PAGE = readFileSync(`${__dirname}/movieListPage.html`)
-const SEARCH_PAGE = readFileSync(`${__dirname}/searchPage.html`)
+const MOVIE_SEARCH_PAGE = readFileSync(`${__dirname}/movieSearchPage.html`)
 const MOVIE_PAGE = readFileSync(`${__dirname}/moviePage.html`)
 const EMBEDDED_MOVIE_PAGE = readFileSync(`${__dirname}/embeddedMoviePage.html`)
 
@@ -37,7 +37,7 @@ describe('PornHub', () => {
         id: 'ph5aa12b2401ac4',
         url: 'https://www.pornhub.com/view_video.php?viewkey=ph5aa12b2401ac4',
         title: 'Sucking and fucking on the couch (Facial)',
-        duration: '497',
+        duration: '8:17',
         views: '1,627,577',
         image: 'https://bi.phncdn.com/videos/201803/08/157338061/original/(m=eGcEGgaaaa)(mh=2jW2n93BDKx8OuSY)10.jpg',
         tags: [
@@ -49,24 +49,23 @@ describe('PornHub', () => {
   })
 
   describe('#_parseMovieListPage()', () => {
-    test('retrieves an array of movies from the sample list page', () => {
+    test('retrieves an array of movies from the sample movie list page', () => {
       let adapter = new PornHub()
       let results = adapter._parseMovieListPage(MOVIE_LIST_PAGE)
 
-      expect(results).toHaveLength(40)
+      expect(results).toHaveLength(32)
       expect(results[0]).toEqual({
-        id: 'ph591c49b831236',
-        title: 'BANGBROS - PAWG Alexis Texas Has a Fat and Juicy White Ass (ap9719)',
-        image: 'https://bi.phncdn.com/videos/201705/17/116792261/original/(m=ecuKGgaaaa)(mh=8FbIp-FeeUJsWqVU)2.jpg',
-        views: '11.5M',
+        id: 'ph5a54dc672eccb',
+        title: 'skinny teen pussy play solo',
+        image: 'https://bi.phncdn.com/videos/201801/09/149326282/thumbs_5/(m=ecuKGgaaaa)(mh=6XssuG2fh3DV7e9P)1.jpg',
+        views: '130K',
+        duration: '7:04',
       })
     })
-  })
 
-  describe('#_parseSearchPage()', () => {
     test('retrieves an array of movies from the sample search page', () => {
       let adapter = new PornHub()
-      let results = adapter._parseSearchPage(SEARCH_PAGE)
+      let results = adapter._parseMovieListPage(MOVIE_SEARCH_PAGE)
 
       expect(results).toHaveLength(20)
       expect(results[0]).toEqual({
@@ -74,6 +73,7 @@ describe('PornHub', () => {
         title: 'deep throating and face fucking compilation - fshow',
         image: 'https://bi.phncdn.com/videos/201511/15/61670831/original/(m=ecuKGgaaaa)(mh=0RaAOd1Mk9iJsQ8o)3.jpg',
         views: '2.4M',
+        duration: '40:39',
       })
       results.forEach((result) => {
         expect(result.id).toBeTruthy()
