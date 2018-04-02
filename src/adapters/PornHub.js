@@ -134,15 +134,16 @@ class PornHub extends AdapterBase {
       headers: REQUEST_HEADERS,
       query: { page },
     }
+    let { search, genre } = query
     let url
 
-    if (!query.search && !query.genre) {
+    if (!search && !genre) {
       // When nothing is specified, get the hottest videos
       url = BASE_URL
       options.query.o = 'ht'
     } else {
       url = SEARCH_URL
-      options.query.search = `${query.genre} ${query.search}`
+      options.query.search = genre ? `${genre} ${search}` : search
     }
 
     let { body } = await got(url, options)
