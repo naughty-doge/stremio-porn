@@ -50,7 +50,7 @@ class PornHub extends AdapterBase {
   static SUPPORTED_TYPES = SUPPORTED_TYPES
   static ITEMS_PER_PAGE = ITEMS_PER_PAGE
 
-  _normalizeItemResult(item) {
+  _normalizeItem(item) {
     return {
       type: 'movie',
       id: item.id,
@@ -66,7 +66,7 @@ class PornHub extends AdapterBase {
     }
   }
 
-  _normalizeStreamResult(stream) {
+  _normalizeStream(stream) {
     return {
       ...stream,
       title: 'SD',

@@ -1,11 +1,11 @@
 class AdapterBase {
   static SUPPORTED_TYPES = []
 
-  _normalizeItemResult(item) {
+  _normalizeItem(item) {
     return item
   }
 
-  _normalizeStreamResult(stream) {
+  _normalizeStream(stream) {
     return stream
   }
 
@@ -66,7 +66,7 @@ class AdapterBase {
 
     let pagination = this._paginate(request)
     let results = await this._find(request.query, pagination)
-    return results.map((item) => this._normalizeItemResult(item))
+    return results.map((item) => this._normalizeItem(item))
   }
 
   async getItem(request) {
@@ -74,7 +74,7 @@ class AdapterBase {
 
     let { type, id } = request.query
     let result = await this._getItem(type, id)
-    return result ? [this._normalizeItemResult(result)] : []
+    return result ? [this._normalizeItem(result)] : []
   }
 
   async getStreams(request) {
@@ -82,7 +82,7 @@ class AdapterBase {
 
     let { type, id } = request.query
     let results = await this._getStreams(type, id)
-    return results.map((stream) => this._normalizeStreamResult(stream))
+    return results.map((stream) => this._normalizeStream(stream))
   }
 }
 

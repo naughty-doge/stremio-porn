@@ -18,7 +18,7 @@ class Chaturbate extends AdapterBase {
   static SUPPORTED_TYPES = SUPPORTED_TYPES
   static ITEMS_PER_PAGE = ITEMS_PER_PAGE
 
-  _normalizeItemResult(item) {
+  _normalizeItem(item) {
     return {
       type: 'tv',
       id: item.id,
@@ -34,7 +34,7 @@ class Chaturbate extends AdapterBase {
     }
   }
 
-  _normalizeStreamResult(stream) {
+  _normalizeStream(stream) {
     return {
       ...stream,
       title: 'Watch',

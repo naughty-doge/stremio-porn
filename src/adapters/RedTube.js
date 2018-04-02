@@ -16,7 +16,7 @@ class RedTube extends AdapterBase {
   static SUPPORTED_TYPES = SUPPORTED_TYPES
   static ITEMS_PER_PAGE = ITEMS_PER_PAGE
 
-  _normalizeItemResult({ video }) {
+  _normalizeItem({ video }) {
     let tags = video.tags && Object.values(video.tags)
       .map((tag) => {
         return (typeof tag === 'string') ? tag : tag.tag_name
@@ -40,7 +40,7 @@ class RedTube extends AdapterBase {
     }
   }
 
-  _normalizeStreamResult(stream) {
+  _normalizeStream(stream) {
     return {
       ...stream,
       availability: 1,
