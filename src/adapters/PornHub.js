@@ -24,9 +24,17 @@ function makeEmbeddedMovieUrl(id) {
 }
 
 function viewsToNumber(views) {
-  return Number(
-    views.replace(/,/g, '').replace(/k/ig, '000').replace(/m/ig, '000000')
-  )
+  let viewsNumber = Number(views.replace(',', '').match(/^[0-9.]+/))
+
+  if (views.includes('K')) {
+    return viewsNumber * 1000
+  }
+
+  if (views.includes('M')) {
+    return viewsNumber * 1000000
+  }
+
+  return viewsNumber
 }
 
 function formatDuration(seconds) {
@@ -51,7 +59,7 @@ class PornHub extends AdapterBase {
       poster: item.image,
       posterShape: 'landscape',
       website: item.url || makeMovieUrl(item.id),
-      runtime: formatDuration(item.duration),
+      runtime: item.duration,
       popularity: viewsToNumber(item.views),
       isFree: true,
     }
@@ -75,7 +83,8 @@ class PornHub extends AdapterBase {
       let $image = $item.find('img.thumb')
       let image = $image.attr('data-image') || $image.attr('data-mediumthumb')
       let views = $item.find('.views > var').text()
-      return { id, title, image, views }
+      let duration = $item.find('.duration').text()
+      return { id, title, image, views, duration }
     }).toArray()
   }
 
@@ -98,8 +107,9 @@ class PornHub extends AdapterBase {
     let id = new URL(url).searchParams.get('viewkey')
     let image = $('meta[property="og:image"]').attr('content')
     let tags = $('.tagsWrapper > a').map((i, link) => $(link).text()).toArray()
-    let duration = $('meta[property="video:duration"]').attr('content')
     let views = $('.rating-info-container > .views > .count').text()
+    let duration = $('meta[property="video:duration"]').attr('content')
+    duration = duration && formatDuration(duration)
     return { title, url, id, image, duration, views, tags }
   }
 
