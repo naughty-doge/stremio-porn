@@ -8,6 +8,7 @@ const BASE_URL = 'https://www.pornhub.com'
 const SEARCH_URL = 'https://www.pornhub.com/video/search'
 const MOVIE_BASE_URL = 'https://www.pornhub.com/view_video.php'
 const ITEMS_PER_PAGE = 40
+const ITEMS_PER_SEARCH_PAGE = 20
 const SUPPORTED_TYPES = ['movie']
 const REQUEST_HEADERS = {
   'user-agent': 'stremio-porn',
@@ -122,6 +123,10 @@ class PornHub extends AdapterBase {
     let quality = 'SD'
 
     return { url, quality }
+  }
+
+  _paginate(request, itemsPerPage = ITEMS_PER_SEARCH_PAGE) {
+    return super._paginate(request, itemsPerPage)
   }
 
   async _findByPage(query, page) {
