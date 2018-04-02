@@ -28,6 +28,23 @@ class AdapterBase {
     }
   }
 
+  _validateRequest(request) {
+    let type = typeof request
+    let { SUPPORTED_TYPES } = this.constructor
+
+    if (type !== 'object') {
+      throw new Error(`A request must be an object, ${type} given`)
+    }
+
+    if (!request.query) {
+      throw new Error('Request query must not be empty')
+    }
+
+    if (!SUPPORTED_TYPES.includes(request.query.type)) {
+      throw new Error(`Content type ${request.query.type} is not supported`)
+    }
+  }
+
   async _find(query, pagination) {
     let {
       pages,
@@ -45,11 +62,7 @@ class AdapterBase {
   }
 
   async find(request) {
-    let { SUPPORTED_TYPES } = this.constructor
-
-    if (!SUPPORTED_TYPES.includes(request.query.type)) {
-      throw new Error(`Content type ${request.query.type} is not supported`)
-    }
+    this._validateRequest(request)
 
     let pagination = this._paginate(request)
     let results = await this._find(request.query, pagination)
@@ -57,25 +70,17 @@ class AdapterBase {
   }
 
   async getItem(request) {
+    this._validateRequest(request)
+
     let { type, id } = request.query
-    let { SUPPORTED_TYPES } = this.constructor
-
-    if (!SUPPORTED_TYPES.includes(type)) {
-      throw new Error(`Content type ${type} is not supported`)
-    }
-
     let result = await this._getItem(type, id)
     return result ? [this._normalizeItemResult(result)] : []
   }
 
   async getStreams(request) {
+    this._validateRequest(request)
+
     let { type, id } = request.query
-    let { SUPPORTED_TYPES } = this.constructor
-
-    if (!SUPPORTED_TYPES.includes(type)) {
-      throw new Error(`Content type ${type} is not supported`)
-    }
-
     let results = await this._getStreams(type, id)
     return results.map((stream) => this._normalizeStreamResult(stream))
   }
