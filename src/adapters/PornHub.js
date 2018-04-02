@@ -5,9 +5,10 @@ import AdapterBase from '../AdapterBase'
 
 
 const BASE_URL = 'https://www.pornhub.com'
+const MOVIES_URL = 'https://www.pornhub.com/video'
 const SEARCH_URL = 'https://www.pornhub.com/video/search'
 const MOVIE_BASE_URL = 'https://www.pornhub.com/view_video.php'
-const ITEMS_PER_PAGE = 40
+const ITEMS_PER_PAGE = 32
 const ITEMS_PER_SEARCH_PAGE = 20
 const SUPPORTED_TYPES = ['movie']
 const REQUEST_HEADERS = {
@@ -75,7 +76,9 @@ class PornHub extends AdapterBase {
     }
   }
 
-  _extractMovies($, selector) {
+  _parseMovieListPage(body) {
+    let $ = cheerio.load(body)
+    let selector = '.nf-videos > .sectionWrapper:first-child > .videos > li'
     return $(selector).map((i, item) => {
       let $item = $(item)
       let id = $item.attr('_vkey')
@@ -86,18 +89,6 @@ class PornHub extends AdapterBase {
       let duration = $item.find('.duration').text()
       return { id, title, image, views, duration }
     }).toArray()
-  }
-
-  _parseMovieListPage(body) {
-    let $ = cheerio.load(body)
-    let selector = '.videos > li'
-    return this._extractMovies($, selector)
-  }
-
-  _parseSearchPage(body) {
-    let $ = cheerio.load(body)
-    let selector = '.nf-videos > .sectionWrapper:first-child > .videos > li'
-    return this._extractMovies($, selector)
   }
 
   _parseMoviePage(body) {
@@ -147,22 +138,21 @@ class PornHub extends AdapterBase {
     let { search, genre } = query
     let url
 
-    if (!search && !genre) {
-      // When nothing is specified, get the hottest videos
-      url = BASE_URL
-      options.query.o = 'ht'
-    } else {
+    if (search && genre) {
       url = SEARCH_URL
-      options.query.search = genre ? `${genre} ${search}` : search
+      options.query.search = `${genre} ${search}`
+    } else if (genre) {
+      url = SEARCH_URL
+      options.query.search = genre
+    } else if (search) {
+      url = SEARCH_URL
+      options.query.search = search
+    } else {
+      url = MOVIES_URL
     }
 
     let { body } = await got(url, options)
-
-    if (url === SEARCH_URL) {
-      return this._parseSearchPage(body)
-    } else {
-      return this._parseMovieListPage(body)
-    }
+    return this._parseMovieListPage(body)
   }
 
   async _getItem(type, id) {
