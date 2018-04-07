@@ -7,9 +7,6 @@ const EMBED_URL = 'https://embed.redtube.com'
 const TAGS_TO_SKIP = ['teens'] // For some reason Teens doesn't work properly
 const ITEMS_PER_PAGE = 20
 const SUPPORTED_TYPES = ['movie']
-const REQUEST_HEADERS = {
-  'user-agent': 'stremio-porn',
-}
 
 
 class RedTube extends AdapterBase {
@@ -52,7 +49,7 @@ class RedTube extends AdapterBase {
   async _requestApi(query) {
     let options = {
       json: true,
-      headers: REQUEST_HEADERS,
+      headers: this.constructor.REQUEST_HEADERS,
       query: {
         ...query,
         output: 'json',
@@ -120,7 +117,7 @@ class RedTube extends AdapterBase {
 
   async _getStreams(type, id) {
     let options = {
-      headers: REQUEST_HEADERS,
+      headers: this.constructor.REQUEST_HEADERS,
       query: { id },
     }
     let { body, statusCode } = await got(EMBED_URL, options)

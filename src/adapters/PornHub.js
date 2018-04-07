@@ -11,9 +11,6 @@ const MOVIE_BASE_URL = 'https://www.pornhub.com/view_video.php'
 const ITEMS_PER_PAGE = 32
 const ITEMS_PER_SEARCH_PAGE = 20
 const SUPPORTED_TYPES = ['movie']
-const REQUEST_HEADERS = {
-  'user-agent': 'stremio-porn',
-}
 
 
 function makeMovieUrl(id) {
@@ -132,7 +129,7 @@ class PornHub extends AdapterBase {
 
   async _findByPage(query, page) {
     let options = {
-      headers: REQUEST_HEADERS,
+      headers: this.constructor.REQUEST_HEADERS,
       query: { page },
     }
     let { search, genre } = query
@@ -157,7 +154,7 @@ class PornHub extends AdapterBase {
 
   async _getItem(type, id) {
     let options = {
-      headers: REQUEST_HEADERS,
+      headers: this.constructor.REQUEST_HEADERS,
       query: {
         viewkey: id,
       },
@@ -168,7 +165,7 @@ class PornHub extends AdapterBase {
 
   async _getStreams(type, id) {
     let options = {
-      headers: REQUEST_HEADERS,
+      headers: this.constructor.REQUEST_HEADERS,
     }
     let url = makeEmbeddedMovieUrl(id)
     let { body, statusCode } = await got(url, options)

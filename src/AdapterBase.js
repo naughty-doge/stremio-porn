@@ -1,5 +1,8 @@
 class AdapterBase {
   static SUPPORTED_TYPES = []
+  static REQUEST_HEADERS = {
+    'user-agent': 'stremio-porn',
+  }
 
   _normalizeItem(item) {
     return item

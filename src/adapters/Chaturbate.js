@@ -9,9 +9,6 @@ const GET_STREAM_URL = 'https://chaturbate.com/get_edge_hls_url_ajax/'
 // so this is the minimum number
 const ITEMS_PER_PAGE = 60
 const SUPPORTED_TYPES = ['tv']
-const REQUEST_HEADERS = {
-  'user-agent': 'stremio-porn',
-}
 
 
 class Chaturbate extends AdapterBase {
@@ -74,7 +71,7 @@ class Chaturbate extends AdapterBase {
 
   async _findByPage(query, page) {
     let options = {
-      headers: REQUEST_HEADERS,
+      headers: this.constructor.REQUEST_HEADERS,
       query: {
         page,
         keywords: query.search,
@@ -87,7 +84,7 @@ class Chaturbate extends AdapterBase {
 
   async _getItem(type, id) {
     let options = {
-      headers: REQUEST_HEADERS,
+      headers: this.constructor.REQUEST_HEADERS,
     }
     let url = `${BASE_URL}/${id}`
     let { body } = await got(url, options)
