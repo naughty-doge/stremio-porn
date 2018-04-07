@@ -1,94 +1,16 @@
-import got from 'got'
-import AdapterBase from '../AdapterBase'
+import HubTrafficAdapter from './HubTrafficAdapter'
 
 
-const API_URL = 'https://api.redtube.com'
-const EMBED_URL = 'https://embed.redtube.com'
-const TAGS_TO_SKIP = ['teens'] // For some reason Teens doesn't work properly
-const ITEMS_PER_PAGE = 20
-const SUPPORTED_TYPES = ['movie']
+class RedTube extends HubTrafficAdapter {
+  static TAGS_TO_SKIP = ['teens'] // For some reason Teens doesn't work properly
+  static ITEMS_PER_PAGE = 20
 
-
-class RedTube extends AdapterBase {
-  static SUPPORTED_TYPES = SUPPORTED_TYPES
-  static ITEMS_PER_PAGE = ITEMS_PER_PAGE
-
-  _normalizeItem({ video }) {
-    let tags = video.tags && Object.values(video.tags)
-      .map((tag) => {
-        return (typeof tag === 'string') ? tag : tag.tag_name
-      })
-      .filter((tag) => !TAGS_TO_SKIP.includes(tag.toLowerCase()))
-
-    return {
-      type: 'movie',
-      id: video.video_id,
-      name: video.title.trim(),
-      genre: tags,
-      banner: video.thumb,
-      poster: video.thumb,
-      posterShape: 'landscape',
-      year: video.publish_date && video.publish_date.split('-')[0],
-      website: video.url,
-      description: video.url,
-      runtime: video.duration,
-      popularity: Number(video.views),
-      isFree: 1,
-    }
+  _makeMethodUrl(method) {
+    return `https://api.redtube.com?data=redtube.Videos.${method}`
   }
 
-  _normalizeStream(stream) {
-    return {
-      ...stream,
-      availability: 1,
-      isFree: 1,
-      title: stream.title.trim() || 'SD',
-    }
-  }
-
-  async _requestApi(query) {
-    let options = {
-      json: true,
-      headers: this.constructor.REQUEST_HEADERS,
-      query: {
-        ...query,
-        output: 'json',
-        period: 'weekly',
-        thumbsize: query.thumbsize || 'medium',
-      },
-    }
-
-    if (query.tag) {
-      options.query['tags[]'] = query.tag
-    }
-
-    let { body } = await got(API_URL, options)
-
-    if (body.code) {
-      throw new Error(body.message)
-    }
-
-    return body
-  }
-
-  async _findByPage(query, page) {
-    let newQuery = {
-      data: 'redtube.Videos.searchVideos',
-      tag: query.genre,
-      search: query.search,
-      page,
-    }
-    let { videos } = await this._requestApi(newQuery)
-    return videos
-  }
-
-  async _getItem(type, id) {
-    let query = {
-      data: 'redtube.Videos.getVideoById',
-      // eslint-disable-next-line camelcase
-      video_id: Number(id),
-    }
-    return this._requestApi(query)
+  _makeEmbeddedVideoUrl(id) {
+    return `https://embed.redtube.com?id=${id}`
   }
 
   _parseEmbeddedVideoPage(body) {
@@ -113,23 +35,6 @@ class RedTube extends AdapterBase {
     let quality = qualityMatches && qualityMatches[0].toLowerCase()
 
     return { url, quality }
-  }
-
-  async _getStreams(type, id) {
-    let options = {
-      headers: this.constructor.REQUEST_HEADERS,
-      query: { id },
-    }
-    let { body, statusCode } = await got(EMBED_URL, options)
-
-    if (statusCode < 200 || statusCode > 299) {
-      throw new Error(
-        `Unable to get a stream for movie ${id} (status code ${statusCode})`
-      )
-    }
-
-    let { url, quality } = this._parseEmbeddedVideoPage(body)
-    return [{ id, url, title: quality }]
   }
 }
 
