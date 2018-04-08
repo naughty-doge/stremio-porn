@@ -8,7 +8,7 @@ const MANIFEST = {
   id: 'org.stremio.porn',
   version: '0.0.0',
   description: 'Time to unsheathe your sword!',
-  types: ['movie', 'series', 'channel', 'tv'],
+  types: ['movie', 'tv'],
   idProperty: Client.ID,
   dontAnnounce: process.env.NODE_ENV !== 'production',
   sorts: Client.SORTS,

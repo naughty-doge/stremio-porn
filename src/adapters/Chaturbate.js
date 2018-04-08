@@ -1,6 +1,6 @@
 import got from 'got'
 import cheerio from 'cheerio'
-import AdapterBase from '../AdapterBase'
+import BaseAdapter from './BaseAdapter'
 
 
 const BASE_URL = 'https://chaturbate.com'
@@ -11,12 +11,12 @@ const ITEMS_PER_PAGE = 60
 const SUPPORTED_TYPES = ['tv']
 
 
-class Chaturbate extends AdapterBase {
+class Chaturbate extends BaseAdapter {
   static SUPPORTED_TYPES = SUPPORTED_TYPES
   static ITEMS_PER_PAGE = ITEMS_PER_PAGE
 
   _normalizeItem(item) {
-    return {
+    return super._normalizeItem({
       type: 'tv',
       id: item.id,
       name: item.id,
@@ -28,17 +28,17 @@ class Chaturbate extends AdapterBase {
       description: item.subject,
       popularity: item.viewers,
       isFree: true,
-    }
+    })
   }
 
   _normalizeStream(stream) {
-    return {
+    return super._normalizeStream({
       ...stream,
       title: 'Watch',
       availability: 1,
       live: true,
       isFree: true,
-    }
+    })
   }
 
   _parseListPage(body) {

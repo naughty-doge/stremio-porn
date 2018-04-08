@@ -7,7 +7,7 @@ const ID = 'porn_id'
 const SORT_PROP_PREFIX = 'porn.'
 const ADAPTERS = [PornHub, RedTube, Chaturbate]
 const SORTS = ADAPTERS.map(({ name, SUPPORTED_TYPES }) => ({
-  name,
+  name: `Porn: ${name}`,
   prop: `${SORT_PROP_PREFIX}${name}`,
   types: SUPPORTED_TYPES,
 }))
@@ -115,6 +115,7 @@ class Client {
     let results = []
 
     for (let adapter of adapters) {
+      // TODO: if query.type is not specified, split the request into multiple
       let adapterResults = await adapter[method](request)
       adapterResults = adapterResults.map((result) => {
         return normalizeResult(adapter, result, idProp)

@@ -30,11 +30,8 @@ class RedTube extends HubTrafficAdapter {
     let url = urlMatches[1]
       .replace(/[\\/]+/g, '/') // Normalize the slashes...
       .replace(/(https?:\/)/, '$1/') // ...but keep the // after "https:"
-    let fileName = url.split('/').pop().split('?')[0]
-    let qualityMatches = fileName.match(/\d+p/i)
-    let quality = qualityMatches && qualityMatches[0].toLowerCase()
 
-    return { url, quality }
+    return { url }
   }
 }
 

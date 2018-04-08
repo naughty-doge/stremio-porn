@@ -4,7 +4,7 @@
   "description": "",
   "author": "Naughty Doge <naughty-doge@protonmail.com>",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development node dist/index.js",
+    "dev": "cross-env NODE_ENV=development node --inspect dist/index.js",
     "prod": "cross-env NODE_ENV=production node dist/index.js",
     "build": "rimraf dist/**/* && babel src -d dist --source-maps",
     "test-unit": "jest --testNamePattern=\"^(?!.*@integration).*$\"",

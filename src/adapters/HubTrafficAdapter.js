@@ -1,9 +1,9 @@
 import { URL } from 'url'
 import got from 'got'
-import AdapterBase from '../AdapterBase'
+import BaseAdapter from './BaseAdapter'
 
 
-class HubTrafficAdapter extends AdapterBase {
+class HubTrafficAdapter extends BaseAdapter {
   static SUPPORTED_TYPES = ['movie']
   static TAGS_TO_SKIP = []
   static VIDEO_ID_PARAMETER = 'video_id'
@@ -17,7 +17,7 @@ class HubTrafficAdapter extends AdapterBase {
       })
       .filter((tag) => !TAGS_TO_SKIP.includes(tag.toLowerCase()))
 
-    return {
+    return super._normalizeItem({
       type: 'movie',
       id: video.video_id,
       name: video.title.trim(),
@@ -31,16 +31,16 @@ class HubTrafficAdapter extends AdapterBase {
       runtime: video.duration,
       popularity: Number(video.views),
       isFree: 1,
-    }
+    })
   }
 
   _normalizeStream(stream) {
-    return {
+    return super._normalizeStream({
       ...stream,
       availability: 1,
       isFree: 1,
-      title: stream.title.trim() || 'SD',
-    }
+      title: (stream.title && stream.title.trim()) || 'SD',
+    })
   }
 
   _makeMethodUrl() {
@@ -108,11 +108,7 @@ class HubTrafficAdapter extends AdapterBase {
     let { body } = await got(url, options)
 
     let stream = this._parseEmbeddedVideoPage(body)
-    return [{
-      id,
-      url: stream.url,
-      title: stream.quality,
-    }]
+    return [{ id, url: stream.url }]
   }
 }
 

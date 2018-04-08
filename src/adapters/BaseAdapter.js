@@ -1,4 +1,4 @@
-class AdapterBase {
+class BaseAdapter {
   static SUPPORTED_TYPES = []
   static REQUEST_HEADERS = {
     'user-agent': 'stremio-porn',
@@ -9,7 +9,11 @@ class AdapterBase {
   }
 
   _normalizeStream(stream) {
-    return stream
+    if (stream.name) {
+      return stream
+    } else {
+      return { ...stream, name: this.constructor.name }
+    }
   }
 
   _paginate(request, itemsPerPage = this.constructor.ITEMS_PER_PAGE) {
@@ -90,4 +94,4 @@ class AdapterBase {
 }
 
 
-export default AdapterBase
+export default BaseAdapter
