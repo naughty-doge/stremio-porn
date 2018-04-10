@@ -65,4 +65,4 @@ server
     // eslint-disable-next-line no-console
     console.log(`Porn Addon is listening on port ${server.address().port}`)
   })
-  .listen(process.env.PORT || 8008)
+  .listen(process.env.STREMIO_PORN_PORT || 8008)
