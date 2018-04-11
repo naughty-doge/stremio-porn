@@ -1,9 +1,15 @@
+import HttpClient from '../../src/HttpClient'
+
+
 function testAdapter(AdapterClass, items = []) {
   describe('@integration', () => {
     let adapter
 
     beforeEach(() => {
-      adapter = new AdapterClass()
+      let httpClient = new HttpClient({
+        proxy: process.env.STREMIO_PORN_PROXY,
+      })
+      adapter = new AdapterClass(httpClient)
     })
 
     describe('#find()', () => {
