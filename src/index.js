@@ -43,8 +43,8 @@ function methodsToEndpoints(methods) {
   }, {})
 }
 
-
-let client = new Client()
+let proxy = process.env.STREMIO_PORN_PROXY
+let client = new Client({ proxy })
 let methods = {
   'stream.find': (req) => client.getStreams(req),
   'meta.find': (req) => client.find(req),
@@ -62,7 +62,12 @@ let server = http.createServer((req, res) => {
 
 server
   .on('listening', () => {
-    // eslint-disable-next-line no-console
+    /* eslint-disable no-console */
     console.log(`Porn Addon is listening on port ${server.address().port}`)
+
+    if (proxy) {
+      console.log(`Using proxy ${proxy}`)
+    }
+    /* eslint-enable no-console */
   })
   .listen(process.env.STREMIO_PORN_PORT || 8008)
