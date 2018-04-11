@@ -69,6 +69,8 @@
     "cheerio": "^1.0.0-rc.2",
     "cross-env": "^5.1.4",
     "got": "^8.3.0",
+    "http-proxy-agent": "^2.1.0",
+    "https-proxy-agent": "^2.2.1",
     "stremio-addons": "^2.8.14"
   }
 }

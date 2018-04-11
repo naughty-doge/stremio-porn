@@ -1,5 +1,4 @@
 import { URL } from 'url'
-import got from 'got'
 import BaseAdapter from './BaseAdapter'
 
 
@@ -58,7 +57,6 @@ class HubTrafficAdapter extends BaseAdapter {
   async _requestApi(method, params) {
     let options = {
       json: true,
-      headers: this.constructor.REQUEST_HEADERS,
     }
     let url = this._makeMethodUrl(method)
 
@@ -71,7 +69,7 @@ class HubTrafficAdapter extends BaseAdapter {
       })
     }
 
-    let { body } = await got(url, options)
+    let { body } = await this.httpClient.request(url, options)
 
     if (body.code) {
       throw new Error(body.message)
@@ -101,11 +99,8 @@ class HubTrafficAdapter extends BaseAdapter {
   }
 
   async _getStreams(type, id) {
-    let options = {
-      headers: this.constructor.REQUEST_HEADERS,
-    }
     let url = this._makeEmbeddedVideoUrl(id)
-    let { body } = await got(url, options)
+    let { body } = await this.httpClient.request(url)
 
     let stream = this._parseEmbeddedVideoPage(body)
     return [{ id, url: stream.url }]

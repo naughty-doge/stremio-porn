@@ -1,3 +1,4 @@
+import HttpClient from './HttpClient'
 import PornHub from './adapters/PornHub'
 import RedTube from './adapters/RedTube'
 import Chaturbate from './adapters/Chaturbate'
@@ -82,7 +83,10 @@ class Client {
   static ID = ID
   static SORTS = SORTS
 
-  adapters = ADAPTERS.map((Adapter) => new Adapter())
+  constructor(options) {
+    let httpClient = new HttpClient(options)
+    this.adapters = ADAPTERS.map((Adapter) => new Adapter(httpClient))
+  }
 
   _getAdaptersForRequest(request) {
     let { query, adapters } = request

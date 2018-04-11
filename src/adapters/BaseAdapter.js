@@ -1,7 +1,8 @@
 class BaseAdapter {
   static SUPPORTED_TYPES = []
-  static REQUEST_HEADERS = {
-    'user-agent': 'stremio-porn',
+
+  constructor(httpClient) {
+    this.httpClient = httpClient
   }
 
   _normalizeItem(item) {

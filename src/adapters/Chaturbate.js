@@ -1,4 +1,3 @@
-import got from 'got'
 import cheerio from 'cheerio'
 import BaseAdapter from './BaseAdapter'
 
@@ -71,23 +70,19 @@ class Chaturbate extends BaseAdapter {
 
   async _findByPage(query, page) {
     let options = {
-      headers: this.constructor.REQUEST_HEADERS,
       query: {
         page,
         keywords: query.search,
       },
     }
     let url = query.genre ? `${BASE_URL}/tag/${query.genre}` : BASE_URL
-    let { body } = await got(url, options)
+    let { body } = await this.httpClient.request(url, options)
     return this._parseListPage(body)
   }
 
   async _getItem(type, id) {
-    let options = {
-      headers: this.constructor.REQUEST_HEADERS,
-    }
     let url = `${BASE_URL}/${id}`
-    let { body } = await got(url, options)
+    let { body } = await this.httpClient.request(url)
     return this._parseItemPage(body)
   }
 
@@ -95,6 +90,7 @@ class Chaturbate extends BaseAdapter {
     let options = {
       form: true,
       json: true,
+      method: 'post',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'X-Requested-With': 'XMLHttpRequest',
@@ -106,7 +102,7 @@ class Chaturbate extends BaseAdapter {
         bandwidth: 'high',
       },
     }
-    let { body } = await got.post(GET_STREAM_URL, options)
+    let { body } = await this.httpClient.request(GET_STREAM_URL, options)
 
     if (body.success && body.room_status === 'public') {
       return [{ id, url: body.url }]
