@@ -1,12 +1,13 @@
 import HttpClient from './HttpClient'
 import PornHub from './adapters/PornHub'
 import RedTube from './adapters/RedTube'
+import EPorner from './adapters/EPorner'
 import Chaturbate from './adapters/Chaturbate'
 
 
 const ID = 'porn_id'
 const SORT_PROP_PREFIX = 'porn.'
-const ADAPTERS = [PornHub, RedTube, Chaturbate]
+const ADAPTERS = [PornHub, RedTube, EPorner, Chaturbate]
 const SORTS = ADAPTERS.map(({ name, SUPPORTED_TYPES }) => ({
   name: `Porn: ${name}`,
   prop: `${SORT_PROP_PREFIX}${name}`,
