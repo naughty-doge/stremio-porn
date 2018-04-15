@@ -16,6 +16,7 @@ const ITEMS = [{
     website: 'https://www.eporner.com/hd-porn/6NQ6SyoGpTm/Creampie-After-Pool-Fucking/',
     genre: [
       'Blonde', 'Creampie', 'Cumshot', 'Hardcore', 'Pov', 'Outdoor', 'Teens',
+      'Jessie', 'Wylde',
     ],
   },
 }, {
