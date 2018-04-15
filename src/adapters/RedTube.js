@@ -2,6 +2,7 @@ import HubTrafficAdapter from './HubTrafficAdapter'
 
 
 class RedTube extends HubTrafficAdapter {
+  static DISPLAY_NAME = 'RedTube'
   static TAGS_TO_SKIP = ['teens'] // For some reason Teens doesn't work properly
   static ITEMS_PER_PAGE = 20
 

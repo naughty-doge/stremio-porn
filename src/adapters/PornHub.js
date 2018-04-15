@@ -2,6 +2,7 @@ import HubTrafficAdapter from './HubTrafficAdapter'
 
 
 class PornHub extends HubTrafficAdapter {
+  static DISPLAY_NAME = 'PornHub'
   static ITEMS_PER_PAGE = 30
   static VIDEO_ID_PARAMETER = 'id'
 

@@ -9,6 +9,7 @@ const SUPPORTED_TYPES = ['movie']
 
 
 class EPorner extends BaseAdapter {
+  static DISPLAY_NAME = 'EPorner'
   static SUPPORTED_TYPES = SUPPORTED_TYPES
   static ITEMS_PER_PAGE = ITEMS_PER_PAGE
 
