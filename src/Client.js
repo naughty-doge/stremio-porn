@@ -36,7 +36,11 @@ function normalizeRequest(request) {
   }
 
   if (typeof query === 'string') {
-    query = { search: query }
+    // Search requests are troublesome because they don't have a type specified,
+    // and making multiple requests to multiple adapters for different types
+    // and then aggregating them is a lot of work.
+    // So we only support searching for movies for now.
+    query = { search: query, type: 'movie' }
   } else if (query) {
     query = { ...query }
   } else {
