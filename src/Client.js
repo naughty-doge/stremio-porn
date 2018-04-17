@@ -92,7 +92,7 @@ class Client {
 
   _getAdaptersForRequest(request) {
     let { query, adapters } = request
-    let type = query && query.type
+    let { type } = query
     let matchingAdapters = this.adapters
 
     if (adapters.length) {
@@ -110,6 +110,13 @@ class Client {
     return matchingAdapters
   }
 
+  async _invokeAdapterMethod(adapter, method, request, idProp) {
+    let results = await adapter[method](request)
+    return results.map((result) => {
+      return normalizeResult(adapter, result, idProp)
+    })
+  }
+
   async _invokeMethod(method, rawRequest, idProp) {
     let request = normalizeRequest(rawRequest)
     let adapters = this._getAdaptersForRequest(request)
@@ -121,11 +128,9 @@ class Client {
     let results = []
 
     for (let adapter of adapters) {
-      // TODO: if query.type is not specified, split the request into multiple
-      let adapterResults = await adapter[method](request)
-      adapterResults = adapterResults.map((result) => {
-        return normalizeResult(adapter, result, idProp)
-      })
+      let adapterResults = await this._invokeAdapterMethod(
+        adapter, method, request, idProp
+      )
       results.push(adapterResults)
     }
 
