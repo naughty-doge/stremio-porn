@@ -8,6 +8,7 @@ import Chaturbate from './adapters/Chaturbate'
 
 const ID = 'porn_id'
 const SORT_PROP_PREFIX = 'porn.'
+const MAX_ADAPTERS_PER_REQUEST = 1
 const ADAPTERS = [PornHub, RedTube, PornCom, EPorner, Chaturbate]
 const SORTS = ADAPTERS.map(({ name, DISPLAY_NAME, SUPPORTED_TYPES }) => ({
   name: `Porn: ${DISPLAY_NAME}`,
@@ -111,7 +112,7 @@ class Client {
       })
     }
 
-    return matchingAdapters
+    return matchingAdapters.slice(0, MAX_ADAPTERS_PER_REQUEST)
   }
 
   async _invokeAdapterMethod(adapter, method, request, idProp) {
