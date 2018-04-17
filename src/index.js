@@ -1,5 +1,6 @@
 import http from 'http'
 import Stremio from 'stremio-addons'
+import cacheManager from 'cache-manager'
 import Client from './Client'
 
 
@@ -15,12 +16,28 @@ const MANIFEST = {
   // icon: 'URL to 256x256 monochrome png icon',
   // background: 'URL to 1366x756 png background',
 }
+const CACHE_TTLS = {
+  'stream.find': 300,
+  'meta.find': 300,
+  'meta.search': 3600,
+  'meta.get': 300,
+  'meta.genres': 300,
+}
 
 
-function makeEndpoint(name, fn) {
+function makeEndpoint(name, fn, cache, cacheOptions) {
   return async (request, cb, user) => {
-    fn(request, user).then(
-      (result) => cb(null, result),
+    let result
+
+    if (cache) {
+      let cacheKey = JSON.stringify(request)
+      result = cache.wrap(cacheKey, () => fn(request, user), cacheOptions)
+    } else {
+      result = fn(request, user)
+    }
+
+    return result.then(
+      (response) => cb(null, response),
       (err) => {
         /* eslint-disable no-console */
         console.error(
@@ -36,15 +53,23 @@ function makeEndpoint(name, fn) {
   }
 }
 
-function methodsToEndpoints(methods) {
+function methodsToEndpoints(methods, cache) {
   return Object.keys(methods).reduce((endpoints, name) => {
-    endpoints[name] = makeEndpoint(name, methods[name])
+    let cacheOptions = {
+      ttl: CACHE_TTLS[name],
+    }
+    endpoints[name] = makeEndpoint(name, methods[name], cache, cacheOptions)
     return endpoints
   }, {})
 }
 
+
 let proxy = process.env.STREMIO_PORN_PROXY
 let client = new Client({ proxy })
+let cache = (process.env.STREMIO_PORN_CACHE === '0') ?
+  false :
+  cacheManager.caching({ store: 'memory' })
+
 let methods = {
   'stream.find': (req) => client.getStreams(req),
   'meta.find': (req) => client.find(req),
@@ -52,7 +77,7 @@ let methods = {
   'meta.get': (req) => client.getItem(req),
   'meta.genres': (req) => client.getGenres(req),
 }
-let endpoints = methodsToEndpoints(methods)
+let endpoints = methodsToEndpoints(methods, cache)
 
 
 let addon = new Stremio.Server(endpoints, MANIFEST)
@@ -68,6 +93,11 @@ server
     if (proxy) {
       console.log(`Using proxy ${proxy}`)
     }
+
+    if (cache) {
+      console.log('Using cache')
+    }
+
     /* eslint-enable no-console */
   })
   .listen(process.env.STREMIO_PORN_PORT || 8008)
