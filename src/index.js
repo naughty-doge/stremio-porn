@@ -1,5 +1,6 @@
 import http from 'http'
 import Stremio from 'stremio-addons'
+import serveStatic from 'serve-static'
 import Client from './Client'
 
 
@@ -18,6 +19,7 @@ const MANIFEST = {
 const SUPPORTED_METHODS = [
   'stream.find', 'meta.find', 'meta.search', 'meta.get',
 ]
+const STATIC_DIR = 'static'
 const DEFAULT_PORT = 8008
 
 
@@ -56,7 +58,9 @@ let methods = makeMethods(client, SUPPORTED_METHODS)
 
 let addon = new Stremio.Server(methods, MANIFEST)
 let server = http.createServer((req, res) => {
-  addon.middleware(req, res, () => res.end())
+  serveStatic(STATIC_DIR)(req, res, () => {
+    addon.middleware(req, res, () => res.end())
+  })
 })
 
 server
