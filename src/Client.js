@@ -1,3 +1,4 @@
+import cacheManager from 'cache-manager'
 import HttpClient from './HttpClient'
 import PornHub from './adapters/PornHub'
 import RedTube from './adapters/RedTube'
@@ -15,6 +16,32 @@ const SORTS = ADAPTERS.map(({ name, DISPLAY_NAME, SUPPORTED_TYPES }) => ({
   prop: `${SORT_PROP_PREFIX}${name}`,
   types: SUPPORTED_TYPES,
 }))
+const METHODS = {
+  'stream.find': {
+    adapterMethod: 'getStreams',
+    cacheTtl: 300,
+    idProp: ID,
+    expectsArray: true,
+  },
+  'meta.find': {
+    adapterMethod: 'find',
+    cacheTtl: 300,
+    idProp: 'id',
+    expectsArray: true,
+  },
+  'meta.search': {
+    adapterMethod: 'find',
+    cacheTtl: 3600,
+    idProp: 'id',
+    expectsArray: true,
+  },
+  'meta.get': {
+    adapterMethod: 'getItem',
+    cacheTtl: 300,
+    idProp: 'id',
+    expectsArray: false,
+  },
+}
 
 
 function makePornId(adapter, type, id) {
@@ -93,6 +120,10 @@ class Client {
   constructor(options) {
     let httpClient = new HttpClient(options)
     this.adapters = ADAPTERS.map((Adapter) => new Adapter(httpClient))
+
+    if (options.cache) {
+      this.cache = cacheManager.caching({ store: 'memory' })
+    }
   }
 
   _getAdaptersForRequest(request) {
@@ -122,7 +153,7 @@ class Client {
     })
   }
 
-  async _invokeMethod(method, rawRequest, idProp) {
+  async _invokeMethod(methodName, rawRequest, idProp) {
     let request = normalizeRequest(rawRequest)
     let adapters = this._getAdaptersForRequest(request)
 
@@ -134,7 +165,7 @@ class Client {
 
     for (let adapter of adapters) {
       let adapterResults = await this._invokeAdapterMethod(
-        adapter, method, request, idProp
+        adapter, methodName, request, idProp
       )
       results.push(adapterResults)
     }
@@ -142,25 +173,23 @@ class Client {
     return mergeResults(results, request.limit)
   }
 
-  async find(rawRequest) {
-    return this._invokeMethod('find', rawRequest)
-  }
+  async invokeMethod(methodName, rawRequest) {
+    let { adapterMethod, cacheTtl, idProp, expectsArray } = METHODS[methodName]
+    let invokeMethod = async () => {
+      let result = await this._invokeMethod(adapterMethod, rawRequest, idProp)
+      result = expectsArray ? result : result[0]
+      return result
+    }
 
-  async search(rawRequest) {
-    return this._invokeMethod('find', rawRequest)
-  }
-
-  async getItem(rawRequest) {
-    let [result] = await this._invokeMethod('getItem', rawRequest)
-    return result
-  }
-
-  async getStreams(rawRequest) {
-    return this._invokeMethod('getStreams', rawRequest, ID)
-  }
-
-  async getGenres() {
-    return []
+    if (this.cache) {
+      let cacheKey = JSON.stringify(rawRequest)
+      let cacheOptions = {
+        ttl: cacheTtl,
+      }
+      return this.cache.wrap(cacheKey, invokeMethod, cacheOptions)
+    } else {
+      return invokeMethod()
+    }
   }
 }
 
