@@ -14,6 +14,7 @@ const PORT = process.env.STREMIO_PORN_PORT || 8008
 const PROXY = process.env.STREMIO_PORN_PROXY
 const USE_CACHE = (process.env.STREMIO_PORN_CACHE !== '0')
 const IS_PROD = process.env.NODE_ENV === 'production'
+const EMAIL = process.env.STREMIO_PORN_EMAIL
 
 const MANIFEST = {
   name: 'Porn',
@@ -24,8 +25,11 @@ const MANIFEST = {
   idProperty: Client.ID,
   dontAnnounce: !IS_PROD,
   sorts: Client.SORTS,
-  // icon: 'URL to 256x256 monochrome png icon',
-  // background: 'URL to 1366x756 png background',
+  email: EMAIL,
+  contactEmail: EMAIL, // The docs mention this property, but it seems incorrect
+  endpoint: `http://${HOST}:${PORT}/stremioget/stremio/v1`,
+  logo: `http://${HOST}:${PORT}/logo.png`,
+  icon: `http://${HOST}:${PORT}/logo.png`,
 }
 
 
