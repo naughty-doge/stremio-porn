@@ -72,7 +72,9 @@ class HubTrafficAdapter extends BaseAdapter {
     let { body } = await this.httpClient.request(url, options)
 
     if (body.code) {
-      throw new Error(body.message)
+      let err = new Error(body.message)
+      err.code = Number(body.code)
+      throw err
     }
 
     return body
@@ -87,8 +89,22 @@ class HubTrafficAdapter extends BaseAdapter {
       thumbsize: 'medium',
       page,
     }
-    let { videos } = await this._requestApi('searchVideos', newQuery)
-    return videos
+    let result
+
+    try {
+      result = await this._requestApi('searchVideos', newQuery)
+    } catch (err) {
+      // For an unknown reason the weekly period doesn't always work,
+      // so in case of error we retry with "monthly"
+      if (err.code !== 2001) { // 2001 is "No Videos found!"
+        throw err
+      }
+
+      newQuery.period = 'monthly'
+      result = await this._requestApi('searchVideos', newQuery)
+    }
+
+    return result.videos
   }
 
   async _getItem(type, id) {
