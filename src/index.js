@@ -4,6 +4,17 @@ import serveStatic from 'serve-static'
 import Client from './Client'
 
 
+const SUPPORTED_METHODS = [
+  'stream.find', 'meta.find', 'meta.search', 'meta.get',
+]
+const STATIC_DIR = 'static'
+
+const HOST = process.env.STREMIO_PORN_HOST || '0.0.0.0'
+const PORT = process.env.STREMIO_PORN_PORT || 8008
+const PROXY = process.env.STREMIO_PORN_PROXY
+const USE_CACHE = (process.env.STREMIO_PORN_CACHE !== '0')
+const IS_PROD = process.env.NODE_ENV === 'production'
+
 const MANIFEST = {
   name: 'Porn',
   id: 'org.stremio.porn',
@@ -11,16 +22,11 @@ const MANIFEST = {
   description: 'Time to unsheathe your sword!',
   types: ['movie', 'tv'],
   idProperty: Client.ID,
-  dontAnnounce: process.env.NODE_ENV !== 'production',
+  dontAnnounce: !IS_PROD,
   sorts: Client.SORTS,
   // icon: 'URL to 256x256 monochrome png icon',
   // background: 'URL to 1366x756 png background',
 }
-const SUPPORTED_METHODS = [
-  'stream.find', 'meta.find', 'meta.search', 'meta.get',
-]
-const STATIC_DIR = 'static'
-const DEFAULT_PORT = 8008
 
 
 function makeMethod(client, methodName) {
@@ -50,12 +56,8 @@ function makeMethods(client, methodNames) {
 }
 
 
-let proxy = process.env.STREMIO_PORN_PROXY
-let cache = (process.env.STREMIO_PORN_CACHE !== '0')
-let client = new Client({ proxy, cache })
+let client = new Client({ proxy: PROXY, cache: USE_CACHE })
 let methods = makeMethods(client, SUPPORTED_METHODS)
-
-
 let addon = new Stremio.Server(methods, MANIFEST)
 let server = http.createServer((req, res) => {
   serveStatic(STATIC_DIR)(req, res, () => {
@@ -66,16 +68,15 @@ let server = http.createServer((req, res) => {
 server
   .on('listening', () => {
     /* eslint-disable no-console */
-    console.log(`Porn Addon is listening on port ${server.address().port}`)
+    console.log(`Porn Addon is listening on ${HOST}:${PORT}`)
 
-    if (proxy) {
-      console.log(`Using proxy ${proxy}`)
+    if (PROXY) {
+      console.log(`Using proxy ${PROXY}`)
     }
 
-    if (cache) {
+    if (USE_CACHE) {
       console.log('Using cache')
     }
-
     /* eslint-enable no-console */
   })
-  .listen(process.env.STREMIO_PORN_PORT || DEFAULT_PORT)
+  .listen(PORT, HOST)
