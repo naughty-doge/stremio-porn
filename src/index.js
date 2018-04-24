@@ -1,6 +1,7 @@
 import http from 'http'
 import Stremio from 'stremio-addons'
 import serveStatic from 'serve-static'
+import pkg from '../package.json'
 import Client from './Client'
 
 
@@ -19,7 +20,7 @@ const EMAIL = process.env.STREMIO_PORN_EMAIL
 const MANIFEST = {
   name: 'Porn',
   id: 'org.stremio.porn',
-  version: '0.0.0',
+  version: pkg.version,
   description: 'Time to unsheathe your sword!',
   types: ['movie', 'tv'],
   idProperty: Client.ID,
