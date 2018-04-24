@@ -93,4 +93,4 @@ server
     `)
     /* eslint-enable no-console */
   })
-  .listen(PORT, HOST)
+  .listen(PORT)
