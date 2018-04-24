@@ -1,6 +1,7 @@
 import http from 'http'
 import Stremio from 'stremio-addons'
 import serveStatic from 'serve-static'
+import chalk from 'chalk'
 import pkg from '../package.json'
 import Client from './Client'
 
@@ -72,16 +73,24 @@ let server = http.createServer((req, res) => {
 
 server
   .on('listening', () => {
+    let values = {
+      address: `${chalk.green(HOST)}:${chalk.green(PORT)}`,
+      email: EMAIL ? chalk.green(EMAIL) : chalk.red('undefined'),
+      env: IS_PROD ? chalk.green('production') : chalk.green('development'),
+      proxy: PROXY ? chalk.green(PROXY) : chalk.red('off'),
+      cache: USE_CACHE ? chalk.green('on') : chalk.red('off'),
+    }
+
     /* eslint-disable no-console */
-    console.log(`Porn Addon is listening on ${HOST}:${PORT}`)
+    console.log(`
+    Porn Addon is live
 
-    if (PROXY) {
-      console.log(`Using proxy ${PROXY}`)
-    }
-
-    if (USE_CACHE) {
-      console.log('Using cache')
-    }
+    Address:     ${values.address}
+    Email:       ${values.email}
+    Environment: ${values.env}
+    Proxy:       ${values.proxy}
+    Cache:       ${values.cache}
+    `)
     /* eslint-enable no-console */
   })
   .listen(PORT, HOST)
