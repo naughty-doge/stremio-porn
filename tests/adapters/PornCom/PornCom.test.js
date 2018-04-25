@@ -50,7 +50,7 @@ describe('PornCom', () => {
       let adapter = new PornCom()
       let results = adapter._extractQualitiesFromEmbedPage(EMBED_PAGE)
 
-      expect(results).toEqual(['144', '240', '360', '480'])
+      expect(results).toEqual(['144', '240'])
     })
   })
 

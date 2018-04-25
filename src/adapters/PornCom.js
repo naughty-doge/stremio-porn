@@ -72,9 +72,9 @@ class PornCom extends BaseAdapter {
 
   _extractQualitiesFromEmbedPage(body) {
     return body
-      .match(/['"]?id['"]?:\s*['"]\d+p['"]/gi) // Find id:"480p"
-      .map((item) => item.match(/\d+/)[0]) // Extract 480
-      .filter((quality) => Number(quality) < 720) // 720+ are restricted
+      .match(/['"]?id['"]?:\s*['"]\d+p['"]/gi) // Find id:"240p"
+      .map((item) => item.match(/\d+/)[0]) // Extract 240
+      .filter((quality) => Number(quality) < 360) // 360+ are restricted
   }
 
   async _getQualities(id) {
