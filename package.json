@@ -11,6 +11,11 @@
     "test-unit": "jest --testNamePattern=\"^(?!.*@integration).*$\"",
     "test-integration": "jest --testNamePattern=\"^.*@integration.*$\"",
     "test": "jest",
+    "docker-start": "cross-env-shell docker run --rm -p $STREMIO_PORN_PORT:$STREMIO_PORN_PORT -e NODE_ENV -e STREMIO_PORN_HOST -e STREMIO_PORN_PORT -e STREMIO_PORN_EMAIL -e STREMIO_PORN_CACHE -e STREMIO_PORN_CACHE --name=stremio-porn stremio-porn",
+    "docker-dev": "cross-env-shell NODE_ENV=development docker run --rm -p $STREMIO_PORN_PORT:$STREMIO_PORN_PORT -e NODE_ENV -e STREMIO_PORN_HOST -e STREMIO_PORN_PORT -e STREMIO_PORN_EMAIL -e STREMIO_PORN_CACHE -e STREMIO_PORN_CACHE --name=stremio-porn stremio-porn",
+    "docker-prod": "cross-env-shell NODE_ENV=production docker run --rm -p $STREMIO_PORN_PORT:$STREMIO_PORN_PORT -e NODE_ENV -e STREMIO_PORN_HOST -e STREMIO_PORN_PORT -e STREMIO_PORN_EMAIL -e STREMIO_PORN_CACHE -e STREMIO_PORN_CACHE --name=stremio-porn stremio-porn",
+    "docker-stop": "docker stop stremio-porn",
+    "docker-build": "docker build -t stremio-porn .",
     "precommit": "lint-staged"
   },
   "lint-staged": {
