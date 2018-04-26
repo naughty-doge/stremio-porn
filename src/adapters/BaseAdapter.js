@@ -65,7 +65,7 @@ class BaseAdapter {
     })
 
     let results = await Promise.all(requests)
-    results = [].concat(...results)
+    results = [].concat(...results).filter((item) => item)
     return results.slice(skipOnFirstPage, skipOnFirstPage + limit)
   }
 
@@ -74,7 +74,12 @@ class BaseAdapter {
 
     let pagination = this._paginate(request)
     let results = await this._find(request.query, pagination)
-    return results.map((item) => this._normalizeItem(item))
+
+    if (results) {
+      return results.map((item) => this._normalizeItem(item))
+    } else {
+      return []
+    }
   }
 
   async getItem(request) {
@@ -90,7 +95,12 @@ class BaseAdapter {
 
     let { type, id } = request.query
     let results = await this._getStreams(type, id)
-    return results.map((stream) => this._normalizeStream(stream))
+
+    if (results) {
+      return results.map((stream) => this._normalizeStream(stream))
+    } else {
+      return []
+    }
   }
 }
 
