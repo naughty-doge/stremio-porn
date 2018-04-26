@@ -1,16 +1,20 @@
 import cacheManager from 'cache-manager'
 import HttpClient from './HttpClient'
 import PornHub from './adapters/PornHub'
-import RedTube from './adapters/RedTube'
 import PornCom from './adapters/PornCom'
-import EPorner from './adapters/EPorner'
 import Chaturbate from './adapters/Chaturbate'
+
+// RedTube's API has suddenly started to return no results
+// import RedTube from './adapters/RedTube'
+
+// EPorner has restricted video downloads to 30 per day per guest
+// import EPorner from './adapters/EPorner'
 
 
 const ID = 'porn_id'
 const SORT_PROP_PREFIX = 'porn.'
 const MAX_ADAPTERS_PER_REQUEST = 1
-const ADAPTERS = [PornHub, RedTube, PornCom, EPorner, Chaturbate]
+const ADAPTERS = [PornHub, PornCom, Chaturbate]
 const SORTS = ADAPTERS.map(({ name, DISPLAY_NAME, SUPPORTED_TYPES }) => ({
   name: `Porn: ${DISPLAY_NAME}`,
   prop: `${SORT_PROP_PREFIX}${name}`,
