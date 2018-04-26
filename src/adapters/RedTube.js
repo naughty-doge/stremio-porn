@@ -10,11 +10,11 @@ class RedTube extends HubTrafficAdapter {
     return `https://api.redtube.com?data=redtube.Videos.${method}`
   }
 
-  _makeEmbeddedVideoUrl(id) {
+  _makeEmbedUrl(id) {
     return `https://embed.redtube.com?id=${id}`
   }
 
-  _parseEmbeddedVideoPage(body) {
+  _extractStreamsFromEmbed(body) {
     /* eslint-disable max-len */
     // URL example:
     // https://ce.rdtcdn.com/media/videos/201803/12/4930561/480P_600K_4930561.mp4?a5dcae8e1adc0bdaed975f0...

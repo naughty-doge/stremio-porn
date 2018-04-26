@@ -34,11 +34,16 @@ class HubTrafficAdapter extends BaseAdapter {
   }
 
   _normalizeStream(stream) {
+    let title =
+      (stream.title && stream.title.trim()) ||
+      (stream.quality && stream.quality.trim()) ||
+      'SD'
+
     return super._normalizeStream({
       ...stream,
+      title,
       availability: 1,
       isFree: 1,
-      title: (stream.title && stream.title.trim()) || 'SD',
     })
   }
 
@@ -46,11 +51,11 @@ class HubTrafficAdapter extends BaseAdapter {
     throw new Error('Not implemented')
   }
 
-  _makeEmbeddedVideoUrl() {
+  _makeEmbedUrl() {
     throw new Error('Not implemented')
   }
 
-  _parseEmbeddedVideoPage() {
+  _extractStreamsFromEmbed() {
     throw new Error('Not implemented')
   }
 
@@ -104,7 +109,7 @@ class HubTrafficAdapter extends BaseAdapter {
       result = await this._requestApi('searchVideos', newQuery)
     }
 
-    return result.videos
+    return result.videos || result.video
   }
 
   async _getItem(type, id) {
@@ -115,11 +120,11 @@ class HubTrafficAdapter extends BaseAdapter {
   }
 
   async _getStreams(type, id) {
-    let url = this._makeEmbeddedVideoUrl(id)
+    let url = this._makeEmbedUrl(id)
     let { body } = await this.httpClient.request(url)
 
-    let streams = this._parseEmbeddedVideoPage(body)
-    return streams.map((stream) => {
+    let streams = this._extractStreamsFromEmbed(body)
+    return streams && streams.map((stream) => {
       stream.id = id
       return stream
     })

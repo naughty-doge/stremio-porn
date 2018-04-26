@@ -14,11 +14,11 @@ class PornHub extends HubTrafficAdapter {
     return `https://www.pornhub.com/webmasters/${methodAliases[method]}`
   }
 
-  _makeEmbeddedVideoUrl(id) {
+  _makeEmbedUrl(id) {
     return `https://www.pornhub.com/embed/${id}`
   }
 
-  _parseEmbeddedVideoPage(body) {
+  _extractStreamsFromEmbed(body) {
     /* eslint-disable max-len */
     // URL example:
     // https:\/\/de.phncdn.com\/videos\/201503\/28\/46795732\/vl_480_493k_46795732.mp4?ttl=1522227092&ri=1228800&rs=696&hash=268b5f4d76927209ef554ac9e93c6c85

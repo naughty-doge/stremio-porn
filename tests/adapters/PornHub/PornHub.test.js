@@ -3,7 +3,7 @@ import testAdapter from '../testAdapter'
 import PornHub from '../../../src/adapters/PornHub'
 
 
-const EMBEDDED_MOVIE_PAGE = readFileSync(`${__dirname}/embeddedMoviePage.html`)
+const EMBED_PAGE = readFileSync(`${__dirname}/embeddedMoviePage.html`)
 
 const ITEMS = [{
   id: 'ph598cafd0ca22e',
@@ -25,10 +25,10 @@ const ITEMS = [{
 describe('PornHub', () => {
   testAdapter(PornHub, ITEMS)
 
-  describe('#_parseEmbeddedVideoPage()', () => {
+  describe('#_extractStreamsFromEmbed()', () => {
     test('retrieves a stream from a sample embedded movie page', () => {
       let adapter = new PornHub()
-      let result = adapter._parseEmbeddedVideoPage(EMBEDDED_MOVIE_PAGE)
+      let result = adapter._extractStreamsFromEmbed(EMBED_PAGE)
 
       expect(result).toEqual([{
         url: 'https://de.phncdn.com/videos/201503/28/46795732/vl_480_493k_46795732.mp4?ttl=1522227092&ri=1228800&rs=696&hash=268b5f4d76927209ef554ac9e93c6c85',
