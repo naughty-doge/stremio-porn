@@ -68,10 +68,12 @@ class EPorner extends BaseAdapter {
   }
 
   _normalizeStream(stream) {
+    let quality = stream.url.match(/-(\d+)p/i)
+
     return super._normalizeStream({
       id: stream.id,
       url: stream.url,
-      title: stream.quality,
+      title: quality ? quality[1] : 'Watch',
       availability: 1,
       live: true,
       isFree: true,
@@ -96,7 +98,7 @@ class EPorner extends BaseAdapter {
     return `${BASE_URL}/hd-porn/${id}`
   }
 
-  _makeFullStreamUrl(path) {
+  _makeVideoDownloadUrl(path) {
     return BASE_URL + path
   }
 
@@ -130,18 +132,16 @@ class EPorner extends BaseAdapter {
       .find('a')
       .map((i, item) => $(item).text().trim())
       .toArray()
-    let streams = $('#hd-porn-dload a')
-      .map((i, el) => {
-        let streamUrlPath = $(el).attr('href')
-        let quality = `${streamUrlPath.split('/')[3]}p`
-        let url = this._makeFullStreamUrl(streamUrlPath)
-        return { quality, url }
+    let downloadUrls = $('#hd-porn-dload a')
+      .map((i, link) => {
+        let href = $(link).attr('href')
+        return this._makeVideoDownloadUrl(href)
       })
       .toArray()
 
     return {
       _source: 'moviePage',
-      title, url, image, tags, duration, streams,
+      title, url, image, tags, duration, downloadUrls,
     }
   }
 
@@ -158,13 +158,22 @@ class EPorner extends BaseAdapter {
   }
 
   async _getStreams(type, id) {
+    // Video downloads are restricted to 30 per day per guest
+
     let url = this._makeMovieUrl(id)
     let { body } = await this.httpClient.request(url)
-    let { streams } = this._parseMoviePage(body)
-    return streams.map((stream) => {
-      stream.id = id
-      return stream
+    let { downloadUrls } = this._parseMoviePage(body)
+
+    let streamUrls = downloadUrls.map((url) => {
+      return this.httpClient.request(url, { followRedirect: false })
     })
+    streamUrls = await Promise.all(streamUrls)
+
+    return streamUrls
+      .map((res) => {
+        return { id, url: res.headers.location }
+      })
+      .filter((stream) => stream.url)
   }
 }
 

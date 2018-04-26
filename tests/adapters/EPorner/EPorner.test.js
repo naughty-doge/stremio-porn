@@ -50,22 +50,13 @@ describe('EPorner', () => {
         duration: '31:31',
         image: 'https://static-eu-cdn.eporner.com/thumbs/static4/1/15/154/1547921/7_240.jpg',
         tags: ['Blonde', 'Big', 'Tits', 'Cumshot', 'Hardcore', 'Pov', 'Public'],
-        streams: [{
-          quality: '240p',
-          url: 'https://www.eporner.com/dload/byEk66VS4ez/240/1547921-240p.mp4',
-        }, {
-          quality: '360p',
-          url: 'https://www.eporner.com/dload/byEk66VS4ez/360/1547921-360p.mp4',
-        }, {
-          quality: '480p',
-          url: 'https://www.eporner.com/dload/byEk66VS4ez/480/1547921-480p.mp4',
-        }, {
-          quality: '720p',
-          url: 'https://www.eporner.com/dload/byEk66VS4ez/720/1547921-720p.mp4',
-        }, {
-          quality: '1080p',
-          url: 'https://www.eporner.com/dload/byEk66VS4ez/1080/1547921-1080p.mp4',
-        }],
+        downloadUrls: [
+          'https://www.eporner.com/dload/byEk66VS4ez/240/1547921-240p.mp4',
+          'https://www.eporner.com/dload/byEk66VS4ez/360/1547921-360p.mp4',
+          'https://www.eporner.com/dload/byEk66VS4ez/480/1547921-480p.mp4',
+          'https://www.eporner.com/dload/byEk66VS4ez/720/1547921-720p.mp4',
+          'https://www.eporner.com/dload/byEk66VS4ez/1080/1547921-1080p.mp4',
+        ],
       })
     })
   })
