@@ -32,7 +32,7 @@ class RedTube extends HubTrafficAdapter {
       .replace(/[\\/]+/g, '/') // Normalize the slashes...
       .replace(/(https?:\/)/, '$1/') // ...but keep the // after "https:"
 
-    return { url }
+    return [{ url }]
   }
 }
 

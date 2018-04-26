@@ -118,8 +118,11 @@ class HubTrafficAdapter extends BaseAdapter {
     let url = this._makeEmbeddedVideoUrl(id)
     let { body } = await this.httpClient.request(url)
 
-    let stream = this._parseEmbeddedVideoPage(body)
-    return [{ id, url: stream.url }]
+    let streams = this._parseEmbeddedVideoPage(body)
+    return streams.map((stream) => {
+      stream.id = id
+      return stream
+    })
   }
 }
 
