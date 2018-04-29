@@ -11,12 +11,22 @@ const SUPPORTED_METHODS = [
 ]
 const STATIC_DIR = 'static'
 
-const HOST = process.env.STREMIO_PORN_HOST || '0.0.0.0'
+const HOST = process.env.STREMIO_PORN_HOST || 'localhost'
 const PORT = process.env.STREMIO_PORN_PORT || 8008
 const PROXY = process.env.STREMIO_PORN_PROXY
 const USE_CACHE = (process.env.STREMIO_PORN_CACHE !== '0')
 const IS_PROD = process.env.NODE_ENV === 'production'
 const EMAIL = process.env.STREMIO_PORN_EMAIL
+
+
+if (IS_PROD && ['localhost', '127.0.0.1', '0.0.0.0'].includes(HOST)) {
+  // eslint-disable-next-line no-console
+  console.error(
+    chalk.red('\nWhen running in production, a non-local host must be specified\n')
+  )
+  process.exit(1)
+}
+
 
 let availableSites = Client.ADAPTERS.map((a) => a.DISPLAY_NAME).join(', ')
 
