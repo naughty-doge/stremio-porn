@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Spankwire Embed Player</title>
+	<style type="text/css">
+		body {
+			margin: 0px; padding: 0px;
+			position:absolute;
+			width:100%;
+			height:100%;
+		}
+		#mainVideoWrapper {
+			width: 100%;
+			height: 100%;
+		}
+		#mainPlayer {
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+	<script id="MHP1138Loader" type="text/javascript" src="//ss.phncdn.com/html5player/1.0.6/mhp1138.loader.min.js"></script>
+	<script type="text/javascript" src="//ss.phncdn.com/jquery-1.10.2.js"></script>
+
+
+<!-- VIDEO PLAYER BLOCK -->
+<div id="mainVideoWrapper">
+	<div id="mainPlayer">
+		<noscript>
+			<video controls="controls"
+				   autobuffer="autobuffer"
+				   class="player-html5"
+				   preload="metadata"
+                   muted="muted"
+				   poster="//cdn4-image-spankwire.spankcdn.net/m=eaOaaKbWxdOf/originals/1.jpg">
+				<source src="//cdn1-embed-spankwire.spankcdn.net/novideo.flv?validfrom=1524996113&validto=1525003313&rate=2000&burst=2000k&hash=76at4hx%2BYey4Jt3zCEETPiPYQGs%3D" type="video/mp4">
+			</video>
+		</noscript>
+	</div>
+	<!-- THE FOLLOWING DIV WOULD SHOW IF NO FLASH AND NO HTML5 PLAYER DETECTED -->
+	<div id="noFlashMessage" style="display: none;">
+		<a href="http://get.adobe.com/flashplayer/"
+		   rel=nofollow
+		   alt="Spankwire Video flash Player"
+		   border="0">
+			<img class="noFlashErrorMessage" src="//cdn1-static-spankwire.spankcdn.net/images/error-message-final.jpg?cache=1817101524832640" />
+		</a>
+	</div><!-- /#noFlashMessage -->
+</div><!-- /#mainVideoWrapper -->
+
+<script type="text/javascript">
+	var playerData = {};
+
+	playerData.articleId          = '18813592';
+	playerData.serverUrl          = '//www.spankwire.com/';
+
+	playerData.seekSeconds        = '0';
+	playerData.posterUrl          = "\/\/cdn1-image-extremetube.spankcdn.net\/m=eaOaaKbWxdOf\/media\/\/201804\/29\/24260991\/originals\/1.jpg";
+	playerData.duration           = "480";
+	playerData.linkUrl            = "\/\/www.spankwire.com\/Teen-small-tits-big-ass-and-long-hair-blonde-Dolly-is-such-a-supreme\/video18813592\/";
+	playerData.topratedUrl        = "\/home1\/Straight\/Week\/Rating";
+	playerData.mostviewedUrl      = "\/home1\/Straight\/Week\/Views";
+	playerData.cdnPath144         = null;
+	playerData.cdnPath180         = "\/\/cdn1-embed-extremetube.spankcdn.net\/media\/\/201804\/29\/24260991\/mp4_normal_24260991.mp4?validfrom=1524996113&validto=1525003313&rate=34k&burst=2000k&hash=d3lzXN0Tx0e9%2BId7wp%2Bf1T8Momo%3D";
+	playerData.cdnPath240         = "\/\/cdn1-embed-extremetube.spankcdn.net\/media\/\/201804\/29\/24260991\/mp4_high_24260991.mp4?validfrom=1524996113&validto=1525003313&rate=43k&burst=2000k&hash=%2FjtfI%2FozorkRmIENVbnsoN2m29c%3D";
+	playerData.cdnPath480         = "\/\/cdn1-embed-extremetube.spankcdn.net\/media\/\/201804\/29\/24260991\/mp4_ultra_24260991.mp4?validfrom=1524996113&validto=1525003313&rate=65k&burst=2000k&hash=qmx%2BLwYFc3pQRjYmeCKSlNP5ho4%3D";
+	playerData.cdnPath720         = "\/\/cdn1-embed-extremetube.spankcdn.net\/media\/\/201804\/29\/24260991\/mp4_720p_24260991.mp4?validfrom=1524996113&validto=1525003313&rate=141k&burst=2000k&hash=8lag09lM%2BHc%2F%2Frgi4Kcc6gObcr4%3D";
+	playerData.articleTitle       = "Teen small tits big ass and long hair blonde Dolly is such a supreme" || 'This video has been deleted';
+	playerData.relatedUrl         = playerData.serverUrl + "WebServices/Content/PlayerRelated.aspx?ArticleID=" + playerData.articleId;
+
+	MHP1138.initLoader({
+		pathToBuildFolder: '//ss.phncdn.com/html5player/',
+		//Will try to use the players in this order until it found one that is supported by the current browser.
+		playerUsageOrder: ['oldFlash', 'HTML5Player', 'basicHTML5'],
+		//default setting for all player in the page.
+
+		//expect one of the following device type (desktop, touch, tablet, tv) as a string
+		deviceType: 'desktop',
+
+		playerDefaultSettings: {
+			autoplay: false,
+			autoreplay: false,
+			quickSetup: 'spankwire',
+			siteId: 'spankwire',
+			startOffset: playerData.seekSeconds,
+
+			seekParams: {
+				flv: 'start',
+				mp4: 'start',
+			},
+
+			features: {
+				themeColor: '#557bb9'
+			},
+
+			flashSettings: {
+				htmlPauseRoll: false,
+				htmlPostRoll: false,
+				postRollUrl: '',
+				pauseRollUrl: ''
+			},
+			//current default value inside the loader
+			supportTest: {
+				'basicHTML5': {
+					fileToSupport: ['h264', 'ogg']
+				},
+				'HTML5Player': {
+					fileToSupport:  ['h264']
+				},
+				'4Play': {
+					minFlashVersion: "10.1"
+				},
+				'oldFlash': {
+					minFlashVersion: "9.0"
+				}
+			}
+		}
+	});
+
+	MHP1138.createPlayer('mainPlayer', {
+		referrerUrl: document.referrer,
+		embeds: {
+			enabled: true,
+			logoEnabled: true,
+			utmRedirect: {
+				logo: true,
+				relatedBtns: true,
+				thumbs: true
+			},
+			redirect: {
+				onFullscreen: true,
+				onMenu: false,
+				logoUrl: playerData.linkUrl,
+				relatedUrl: playerData.topratedUrl,
+				mostViewedUrl: playerData.mostviewedUrl,
+				mftuUrl: playerData.linkUrl,
+				topRatedUrl: playerData.topratedUrl,
+				relatedInNewTab: true
+			}
+		},
+
+		medias: {
+			poster: playerData.posterUrl,
+			sources: {
+				180: playerData.cdnPath180,
+				240: playerData.cdnPath240,
+				480: playerData.cdnPath480,
+				720: playerData.cdnPath720
+			},
+			thumbs: {
+				urlPattern: '',
+				samplingFrequency: 120
+			},
+			videoUrl: playerData.linkUrl,
+			videoTitle: playerData.articleTitle,
+			videoDuration: playerData.duration,
+			defaultQuality: [720,480,240,180]
+		},
+
+		menu: {
+			relatedUrl: playerData.relatedUrl
+		},
+
+		features:{
+			logo: true,
+			shareBar: false
+		},
+
+		events: {
+			onRedirect: function() {
+				htEmbedTrack.track();
+			},
+			video_pause: function() {
+				document.title = playerData.articleTitle;
+			},
+			video_play: function() {
+				document.title = "▶ " + playerData.articleTitle;
+			},
+			downloadsFlashMessage: function(id) {
+				document.getElementById('noFlashMessage').removeAttribute("style");
+			}
+		}
+	});
+
+</script>
+
+	        <script type="text/javascript">
+                (function() {
+                        var rta = document.createElement('script');
+                        rta.type = 'text/javascript';
+                        rta.id = 'htScript';
+                        rta.async = true;
+                        rta.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'ht.spankwire.com/js/eht.js?site_id=7';
+                        var s = document.getElementsByTagName('script')[0];
+                        s.parentNode.insertBefore(rta, s);
+                })();
+        </script></body>
+</html>

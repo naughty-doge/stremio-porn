@@ -2,6 +2,7 @@ import cacheManager from 'cache-manager'
 import HttpClient from './HttpClient'
 import PornHub from './adapters/PornHub'
 import YouPorn from './adapters/YouPorn'
+import SpankWire from './adapters/SpankWire'
 import PornCom from './adapters/PornCom'
 import Chaturbate from './adapters/Chaturbate'
 
@@ -15,7 +16,7 @@ import Chaturbate from './adapters/Chaturbate'
 const ID = 'porn_id'
 const SORT_PROP_PREFIX = 'porn.'
 const MAX_ADAPTERS_PER_REQUEST = 1
-const ADAPTERS = [PornHub, YouPorn, PornCom, Chaturbate]
+const ADAPTERS = [PornHub, YouPorn, SpankWire, PornCom, Chaturbate]
 const SORTS = ADAPTERS.map(({ name, DISPLAY_NAME, SUPPORTED_TYPES }) => ({
   name: `Porn: ${DISPLAY_NAME}`,
   prop: `${SORT_PROP_PREFIX}${name}`,
