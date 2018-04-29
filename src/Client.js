@@ -1,13 +1,11 @@
 import cacheManager from 'cache-manager'
 import HttpClient from './HttpClient'
 import PornHub from './adapters/PornHub'
+import RedTube from './adapters/RedTube'
 import YouPorn from './adapters/YouPorn'
 import SpankWire from './adapters/SpankWire'
 import PornCom from './adapters/PornCom'
 import Chaturbate from './adapters/Chaturbate'
-
-// RedTube's API has suddenly started to return no results
-// import RedTube from './adapters/RedTube'
 
 // EPorner has restricted video downloads to 30 per day per guest
 // import EPorner from './adapters/EPorner'
@@ -16,7 +14,7 @@ import Chaturbate from './adapters/Chaturbate'
 const ID = 'porn_id'
 const SORT_PROP_PREFIX = 'porn.'
 const MAX_ADAPTERS_PER_REQUEST = 1
-const ADAPTERS = [PornHub, YouPorn, SpankWire, PornCom, Chaturbate]
+const ADAPTERS = [PornHub, RedTube, YouPorn, SpankWire, PornCom, Chaturbate]
 const SORTS = ADAPTERS.map(({ name, DISPLAY_NAME, SUPPORTED_TYPES }) => ({
   name: `Porn: ${DISPLAY_NAME}`,
   prop: `${SORT_PROP_PREFIX}${name}`,
@@ -121,6 +119,7 @@ function mergeResults(results) {
 
 class Client {
   static ID = ID
+  static ADAPTERS = ADAPTERS
   static SORTS = SORTS
 
   constructor(options) {

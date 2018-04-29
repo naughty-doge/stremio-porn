@@ -18,11 +18,16 @@ const USE_CACHE = (process.env.STREMIO_PORN_CACHE !== '0')
 const IS_PROD = process.env.NODE_ENV === 'production'
 const EMAIL = process.env.STREMIO_PORN_EMAIL
 
+let availableSites = Client.ADAPTERS.map((a) => a.DISPLAY_NAME).join(', ')
+
 const MANIFEST = {
   name: 'Porn',
   id: 'org.stremio.porn',
   version: pkg.version,
-  description: 'Time to unsheathe your sword!',
+  description: `\
+Time to unsheathe your sword! \
+Watch porn videos and live streams from ${availableSites}\
+`,
   types: ['movie', 'tv'],
   idProperty: Client.ID,
   dontAnnounce: !IS_PROD,
