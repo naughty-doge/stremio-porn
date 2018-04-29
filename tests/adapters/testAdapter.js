@@ -3,6 +3,8 @@ import HttpClient from '../../src/HttpClient'
 
 function testAdapter(AdapterClass, items = []) {
   describe('@integration', () => {
+    jest.setTimeout(20000)
+
     let adapter
 
     beforeEach(() => {

@@ -7,7 +7,7 @@ const DEFAULT_HEADERS = {
   'user-agent': 'stremio-porn',
 }
 const DEFAULT_REQUEST_OPTIONS = {
-  timeout: 10000,
+  timeout: 20000,
 }
 
 

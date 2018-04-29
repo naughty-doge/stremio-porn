@@ -18,7 +18,7 @@ class HubTrafficAdapter extends BaseAdapter {
 
     return super._normalizeItem({
       type: 'movie',
-      id: video.video_id,
+      id: video.video_id || video.id,
       name: video.title.trim(),
       genre: tags,
       banner: video.thumb,
