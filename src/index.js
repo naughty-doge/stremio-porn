@@ -36,7 +36,7 @@ const MANIFEST = {
   version: pkg.version,
   description: `\
 Time to unsheathe your sword! \
-Watch porn videos and live streams from ${availableSites}\
+Watch porn videos and webcam streams from ${availableSites}\
 `,
   types: ['movie', 'tv'],
   idProperty: Client.ID,
@@ -89,23 +89,22 @@ let server = http.createServer((req, res) => {
 server
   .on('listening', () => {
     let values = {
-      address: `${chalk.green(HOST)}:${chalk.green(PORT)}`,
+      endpoint: chalk.green(MANIFEST.endpoint),
       email: EMAIL ? chalk.green(EMAIL) : chalk.red('undefined'),
       env: IS_PROD ? chalk.green('production') : chalk.green('development'),
       proxy: PROXY ? chalk.green(PROXY) : chalk.red('off'),
       cache: USE_CACHE ? chalk.green('on') : chalk.red('off'),
     }
 
-    /* eslint-disable no-console */
+    // eslint-disable-next-line no-console
     console.log(`
     Porn Addon is live
 
-    Address:     ${values.address}
+    Endpoint:    ${values.endpoint}
     Email:       ${values.email}
     Environment: ${values.env}
     Proxy:       ${values.proxy}
     Cache:       ${values.cache}
     `)
-    /* eslint-enable no-console */
   })
   .listen(PORT)
