@@ -94,29 +94,43 @@ class HubTrafficAdapter extends BaseAdapter {
       thumbsize: 'medium',
       page,
     }
-    let result
+    let videos = []
 
     try {
-      result = await this._requestApi('searchVideos', newQuery)
+      let result = await this._requestApi('searchVideos', newQuery)
+      videos = result.videos || result.video
     } catch (err) {
-      // For an unknown reason the weekly period doesn't always work,
-      // so in case of error we retry with "monthly"
-      if (err.code !== 2001) { // 2001 is "No Videos found!"
+      // Ignore the "No Videos found!" error
+      // eslint-disable-next-line eqeqeq
+      if (err.code != 2001) {
         throw err
       }
-
-      newQuery.period = 'monthly'
-      result = await this._requestApi('searchVideos', newQuery)
     }
 
-    return result.videos || result.video
+    // We retry with the monthly period in case there are too few weekly videos
+    if (page === 1 && videos.length < this.constructor.ITEMS_PER_PAGE) {
+      newQuery.period = 'monthly'
+      let result = await this._requestApi('searchVideos', newQuery)
+      videos = result.videos || result.video
+    }
+
+    return videos
   }
 
   async _getItem(type, id) {
     let query = {
       [this.constructor.VIDEO_ID_PARAMETER]: id,
     }
-    return this._requestApi('getVideoById', query)
+
+    try {
+      return await this._requestApi('getVideoById', query)
+    } catch (err) {
+      // Ignore the "No video with this ID." error
+      // eslint-disable-next-line eqeqeq
+      if (err.code != 2002) {
+        throw err
+      }
+    }
   }
 
   async _getStreams(type, id) {
