@@ -1,8 +1,12 @@
-# Porn Addon for Stremio
+<p align="center">
+  <img src="/static/logo.png">
+</p>
+<h1 align="center" style="border: 0">Porn Addon for Stremio</h1>
+<p align="center">
+  <em>Time to unsheathe your sword!</em>
+</p>
 
-_Time to unsheathe your sword!_
-
-A [Stremio](https://www.stremio.com/) addon that provides porn content from various websites:
+This is a [Stremio](https://www.stremio.com/) addon that provides porn content from various websites:
 
 - __Videos__ _(Movies)_: PornHub, RedTube, YouPorn, SpankWire and Porn.com
 - __Webcam streams__ _(TV Channels)_: Chaturbate
@@ -11,10 +15,11 @@ A [Stremio](https://www.stremio.com/) addon that provides porn content from vari
 ## Features
 
 - Adds a dedicated tab in Discover for each website
-- Configurable via environment variables
+- Works in Stremio v4 and v3.6
 - Supports Docker out of the box
 - Caches results in memory
 - Supports HTTPS proxy
+- Configurable via environment variables
 
 
 ## Usage
