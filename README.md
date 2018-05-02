@@ -59,3 +59,8 @@ To configure the addon, set the following environment variables before running i
 - `STREMIO_PORN_EMAIL` — email address that can be used to contact you (unset by default)
 - `STREMIO_PORN_PROXY` — HTTPS proxy address to route all the outbound requests to (unset by default)
 - `STREMIO_PORN_CACHE` — toggles the in-memory cache (defaults to 1)
+
+
+## Screenshots
+
+![Discover](/static/screenshot_discover.jpg)
