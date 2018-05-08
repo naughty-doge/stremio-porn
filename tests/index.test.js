@@ -126,6 +126,7 @@ describe('Addon @integration', () => {
     let staticFiles = [
       'logo.png',
       'screenshot_discover.jpg',
+      'bg.jpg',
     ]
     let promises = staticFiles.map((file) => {
       return new Promise((resolve) => {

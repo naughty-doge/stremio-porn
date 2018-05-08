@@ -38,6 +38,7 @@ Watch porn videos and webcam streams from ${availableSites}\
   endpoint: ENDPOINT,
   logo: `${ENDPOINT}/logo.png`,
   icon: `${ENDPOINT}/logo.png`,
+  background: `${ENDPOINT}/bg.jpg`,
 }
 
 
