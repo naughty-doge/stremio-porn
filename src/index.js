@@ -3,7 +3,7 @@ import Stremio from 'stremio-addons'
 import serveStatic from 'serve-static'
 import chalk from 'chalk'
 import pkg from '../package.json'
-import Client from './Client'
+import PornClient from './PornClient'
 
 
 const SUPPORTED_METHODS = [
@@ -28,7 +28,7 @@ if (IS_PROD && ['localhost', '127.0.0.1', '0.0.0.0'].includes(HOST)) {
 }
 
 
-let availableSites = Client.ADAPTERS.map((a) => a.DISPLAY_NAME).join(', ')
+let availableSites = PornClient.ADAPTERS.map((a) => a.DISPLAY_NAME).join(', ')
 
 const MANIFEST = {
   name: 'Porn',
@@ -39,9 +39,9 @@ Time to unsheathe your sword! \
 Watch porn videos and webcam streams from ${availableSites}\
 `,
   types: ['movie', 'tv'],
-  idProperty: Client.ID,
+  idProperty: PornClient.ID,
   dontAnnounce: !IS_PROD,
-  sorts: Client.SORTS,
+  sorts: PornClient.SORTS,
   email: EMAIL,
   contactEmail: EMAIL, // The docs mention this property, but it seems incorrect
   endpoint: `http://${HOST}:${PORT}/stremioget/stremio/v1`,
@@ -51,21 +51,26 @@ Watch porn videos and webcam streams from ${availableSites}\
 
 
 function makeMethod(client, methodName) {
-  return (request, cb) => {
-    return client.invokeMethod(methodName, request).then(
-      (response) => cb(null, response),
-      (err) => {
-        /* eslint-disable no-console */
-        console.error(
-          'An error has occurred while processing ' +
+  return async (request, cb) => {
+    let response
+    let error
+
+    try {
+      response = await client.invokeMethod(methodName, request)
+    } catch (err) {
+      error = err
+
+      /* eslint-disable no-console */
+      console.error(
+        'An error has occurred while processing ' +
           `the following request to ${methodName}:`
-        )
-        console.error(request)
-        console.error(err)
-        /* eslint-enable no-console */
-        cb(err)
-      }
-    )
+      )
+      console.error(request)
+      console.error(err)
+      /* eslint-enable no-console */
+    }
+
+    cb(error, response)
   }
 }
 
@@ -77,7 +82,7 @@ function makeMethods(client, methodNames) {
 }
 
 
-let client = new Client({ proxy: PROXY, cache: USE_CACHE })
+let client = new PornClient({ proxy: PROXY, cache: USE_CACHE })
 let methods = makeMethods(client, SUPPORTED_METHODS)
 let addon = new Stremio.Server(methods, MANIFEST)
 let server = http.createServer((req, res) => {
@@ -108,3 +113,5 @@ server
     `)
   })
   .listen(PORT)
+
+export default server
