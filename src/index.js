@@ -16,7 +16,7 @@ const ID = process.env.STREMIO_PORN_ID || DEFAULT_ID
 const ENDPOINT = process.env.STREMIO_PORN_ENDPOINT || 'http://localhost'
 const PORT = process.env.STREMIO_PORN_PORT || '8008'
 const PROXY = process.env.STREMIO_PORN_PROXY
-const USE_CACHE = (process.env.STREMIO_PORN_CACHE !== '0')
+const CACHE = process.env.STREMIO_PORN_CACHE || '1'
 const EMAIL = process.env.STREMIO_PORN_EMAIL
 const IS_PROD = process.env.NODE_ENV === 'production'
 
@@ -86,7 +86,7 @@ function makeMethods(client, methodNames) {
 }
 
 
-let client = new PornClient({ proxy: PROXY, cache: USE_CACHE })
+let client = new PornClient({ proxy: PROXY, cache: CACHE })
 let methods = makeMethods(client, SUPPORTED_METHODS)
 let addon = new Stremio.Server(methods, MANIFEST)
 let server = http.createServer((req, res) => {
@@ -103,7 +103,9 @@ server
       email: EMAIL ? chalk.green(EMAIL) : chalk.red('undefined'),
       env: IS_PROD ? chalk.green('production') : chalk.green('development'),
       proxy: PROXY ? chalk.green(PROXY) : chalk.red('off'),
-      cache: USE_CACHE ? chalk.green('on') : chalk.red('off'),
+      cache: (CACHE === '0') ?
+        chalk.red('off') :
+        chalk.green(CACHE === '1' ? 'on' : CACHE),
     }
 
     // eslint-disable-next-line no-console

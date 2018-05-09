@@ -17,7 +17,7 @@ This is a [Stremio](https://www.stremio.com/) addon that provides porn content f
 - Adds a dedicated tab in Discover for each website
 - Works in Stremio v4 and v3.6
 - Supports Docker out of the box
-- Caches results in memory
+- Caches results in memory or Redis
 - Supports HTTPS proxy
 - Configurable via environment variables
 
@@ -67,7 +67,7 @@ To configure the addon, set the following environment variables before running i
 - `STREMIO_PORN_PORT` — port to listen to (defaults to `8008`)
 - `STREMIO_PORN_EMAIL` — email address that can be used to contact you (unset by default)
 - `STREMIO_PORN_PROXY` — HTTPS proxy address to route all the outbound requests to (unset by default)
-- `STREMIO_PORN_CACHE` — toggles the in-memory cache (defaults to 1)
+- `STREMIO_PORN_CACHE` — 0 to turn caching off, 1 to cache in memory, or Redis URL to cache in Redis (defaults to 1)
 
 
 ## Screenshots

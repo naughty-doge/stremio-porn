@@ -1,4 +1,5 @@
 import cacheManager from 'cache-manager'
+import redisStore from 'cache-manager-redis-store'
 import HttpClient from './HttpClient'
 import PornHub from './adapters/PornHub'
 import RedTube from './adapters/RedTube'
@@ -126,8 +127,13 @@ class PornClient {
     let httpClient = new HttpClient(options)
     this.adapters = ADAPTERS.map((Adapter) => new Adapter(httpClient))
 
-    if (options.cache) {
+    if (options.cache === '1') {
       this.cache = cacheManager.caching({ store: 'memory' })
+    } else if (options.cache && options.cache !== '0') {
+      this.cache = cacheManager.caching({
+        store: redisStore,
+        url: options.cache,
+      })
     }
   }
 
