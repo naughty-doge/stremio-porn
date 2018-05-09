@@ -12,7 +12,7 @@ import Chaturbate from './adapters/Chaturbate'
 
 
 const ID = 'porn_id'
-const SORT_PROP_PREFIX = 'porn.'
+const SORT_PROP_PREFIX = 'popularities.porn.'
 const MAX_ADAPTERS_PER_REQUEST = 1
 const ADAPTERS = [PornHub, RedTube, YouPorn, SpankWire, PornCom, Chaturbate]
 const SORTS = ADAPTERS.map(({ name, DISPLAY_NAME, SUPPORTED_TYPES }) => ({
