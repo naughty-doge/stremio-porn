@@ -22,7 +22,11 @@ This is a [Stremio](https://www.stremio.com/) addon that provides porn content f
 - Configurable via environment variables
 
 
-## Usage
+## Running
+
+The addon is a web server that fetches video streams from the porn sites in response to requests from Stremio clients. It uses environment variables for configuration and includes a handful of npm scripts to run with or without Docker.
+
+To install and quickly start the addon, do:
 
 ```
 git clone https://github.com/naughty-doge/stremio-porn
@@ -31,14 +35,12 @@ npm install
 npm start
 ```
 
-After starting the addon, open its endpoint in the browser or enter it in the Stremio app.
+By default the server starts on `localhost:8008` in development mode and doesn't announce itself to the Stremio addon tracker. To add the addon to Stremio, open its endpoint in the browser and click the Install button, or enter the URL in the app's Addons section.
 
-The addon is a web server that fetches video streams from the porn sites in response to requests from Stremio clients. It uses environment variables for configuration and includes a handful of npm scripts to run with or without Docker.
-
-By default the server listens to `localhost:8008` and doesn't announce itself to the Stremio addon tracker. In order for it to work publicly, the following conditions must be met:
-- `NODE_ENV` must be set to `production`
-- `STREMIO_PORN_ENDPOINT` must be a public URL of the server
-- `STREMIO_PORN_ID` must be non-default
+In order for the addon to work publicly, the following environment variables must be set:
+- `NODE_ENV` to `production`
+- `STREMIO_PORN_ENDPOINT` to a public URL of the server
+- `STREMIO_PORN_ID` to a non-default value
 
 
 ## npm scripts
@@ -67,7 +69,7 @@ To configure the addon, set the following environment variables before running i
 - `STREMIO_PORN_PORT` — port to listen to (defaults to `8008`)
 - `STREMIO_PORN_EMAIL` — email address that can be used to contact you (unset by default)
 - `STREMIO_PORN_PROXY` — HTTPS proxy address to route all the outbound requests to (unset by default)
-- `STREMIO_PORN_CACHE` — 0 to turn caching off, 1 to cache in memory, or Redis URL to cache in Redis (defaults to 1)
+- `STREMIO_PORN_CACHE` — 0 to turn caching off, 1 to cache in memory, or a Redis URL (e.g. `redis://example.com:6379`) to cache in Redis (defaults to 1)
 
 
 ## Screenshots
