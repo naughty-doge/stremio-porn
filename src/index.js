@@ -10,7 +10,9 @@ const SUPPORTED_METHODS = [
   'stream.find', 'meta.find', 'meta.search', 'meta.get',
 ]
 const STATIC_DIR = 'static'
+const DEFAULT_ID = 'stremio_porn'
 
+const ID = process.env.STREMIO_PORN_ID || DEFAULT_ID
 const ENDPOINT = process.env.STREMIO_PORN_ENDPOINT || 'http://localhost'
 const PORT = process.env.STREMIO_PORN_PORT || '8008'
 const PROXY = process.env.STREMIO_PORN_PROXY
@@ -19,11 +21,21 @@ const EMAIL = process.env.STREMIO_PORN_EMAIL
 const IS_PROD = process.env.NODE_ENV === 'production'
 
 
+if (IS_PROD && ID === DEFAULT_ID) {
+  // eslint-disable-next-line no-console
+  console.error(
+    chalk.red(
+      '\nWhen running in production, a non-default addon identifier must be specified\n'
+    )
+  )
+  process.exit(1)
+}
+
 let availableSites = PornClient.ADAPTERS.map((a) => a.DISPLAY_NAME).join(', ')
 
 const MANIFEST = {
   name: 'Porn',
-  id: 'org.stremio.porn',
+  id: ID,
   version: pkg.version,
   description: `\
 Time to unsheathe your sword! \
@@ -87,6 +99,7 @@ server
   .on('listening', () => {
     let values = {
       endpoint: chalk.green(MANIFEST.endpoint),
+      id: ID === DEFAULT_ID ? chalk.red(ID) : chalk.green(ID),
       email: EMAIL ? chalk.green(EMAIL) : chalk.red('undefined'),
       env: IS_PROD ? chalk.green('production') : chalk.green('development'),
       proxy: PROXY ? chalk.green(PROXY) : chalk.red('off'),
@@ -98,6 +111,7 @@ server
     Porn Addon is live
 
     Endpoint:    ${values.endpoint}
+    Addon Id:    ${values.id}
     Email:       ${values.email}
     Environment: ${values.env}
     Proxy:       ${values.proxy}
