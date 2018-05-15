@@ -3,7 +3,7 @@ import testAdapter from '../testAdapter'
 import RedTube from '../../../src/adapters/RedTube'
 
 
-const EMBED_PAGE = readFileSync(`${__dirname}/embeddedVideoPage.html`)
+const EMBED_PAGE = readFileSync(`${__dirname}/embeddedVideoPage.html`, 'utf8')
 
 const ITEMS = [{
   id: 1,

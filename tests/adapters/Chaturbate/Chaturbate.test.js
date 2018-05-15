@@ -3,8 +3,8 @@ import testAdapter from '../testAdapter'
 import Chaturbate from '../../../src/adapters/Chaturbate'
 
 
-const LIST_PAGE = readFileSync(`${__dirname}/listPage.html`)
-const ITEM_PAGE = readFileSync(`${__dirname}/itemPage.html`)
+const LIST_PAGE = readFileSync(`${__dirname}/listPage.html`, 'utf8')
+const ITEM_PAGE = readFileSync(`${__dirname}/itemPage.html`, 'utf8')
 
 const ITEMS = [{
   id: 'minksky',

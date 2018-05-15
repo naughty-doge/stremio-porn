@@ -15,11 +15,12 @@ console.error = () => {}
 function reset() {
   jest.resetModules()
 
+  delete process.env.STREMIO_PORN_ID
   delete process.env.STREMIO_PORN_ENDPOINT
   delete process.env.STREMIO_PORN_PORT
-  delete process.env.STREMIO_PORN_EMAIL
-  delete process.env.STREMIO_PORN_CACHE
   delete process.env.STREMIO_PORN_PROXY
+  delete process.env.STREMIO_PORN_CACHE
+  delete process.env.STREMIO_PORN_EMAIL
   delete process.env.NODE_ENV
 }
 

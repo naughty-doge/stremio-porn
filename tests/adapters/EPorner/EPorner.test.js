@@ -3,8 +3,8 @@ import testAdapter from '../testAdapter'
 import EPorner from '../../../src/adapters/EPorner'
 
 
-const API_RESPONSE = readFileSync(`${__dirname}/apiResponse.xml`)
-const MOVIE_PAGE = readFileSync(`${__dirname}/moviePage.html`)
+const API_RESPONSE = readFileSync(`${__dirname}/apiResponse.xml`, 'utf8')
+const MOVIE_PAGE = readFileSync(`${__dirname}/moviePage.html`, 'utf8')
 
 const ITEMS = [{
   id: '6NQ6SyoGpTm',

@@ -5,8 +5,8 @@ import testAdapter from '../testAdapter'
 import PornCom from '../../../src/adapters/PornCom'
 
 
-const API_RESPONSE = readFileSync(`${__dirname}/apiResponse.xml`).toString()
-const EMBED_PAGE = readFileSync(`${__dirname}/embedPage.xml`).toString()
+const API_RESPONSE = readFileSync(`${__dirname}/apiResponse.xml`, 'utf8')
+const EMBED_PAGE = readFileSync(`${__dirname}/embedPage.xml`, 'utf8')
 
 const ITEMS = [{
   id: '4163325',

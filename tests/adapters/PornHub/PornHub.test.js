@@ -3,7 +3,7 @@ import testAdapter from '../testAdapter'
 import PornHub from '../../../src/adapters/PornHub'
 
 
-const EMBED_PAGE = readFileSync(`${__dirname}/embeddedMoviePage.html`)
+const EMBED_PAGE = readFileSync(`${__dirname}/embeddedMoviePage.html`, 'utf8')
 
 const ITEMS = [{
   id: 'ph598cafd0ca22e',
