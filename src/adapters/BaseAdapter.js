@@ -1,3 +1,6 @@
+// Contains some common methods as well as public wrappers
+// that prepare requests, redirect them to private methods
+// and normalize results
 class BaseAdapter {
   static SUPPORTED_TYPES = []
 

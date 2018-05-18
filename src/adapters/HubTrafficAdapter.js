@@ -2,6 +2,7 @@ import { URL } from 'url'
 import BaseAdapter from './BaseAdapter'
 
 
+// https://www.hubtraffic.com/
 class HubTrafficAdapter extends BaseAdapter {
   static SUPPORTED_TYPES = ['movie']
   static TAGS_TO_SKIP = []

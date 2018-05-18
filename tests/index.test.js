@@ -30,6 +30,8 @@ function initAddon() {
       // eslint-disable-next-line global-require
       this.server = require('../src/index').default
 
+      // In case an error occurs before the server starts (e.g. port is in use),
+      // it silently fails and the tests stall
       return new Promise((resolve, reject) => {
         this.server.once('listening', () => resolve(this))
         this.server.once('error', (err) => {

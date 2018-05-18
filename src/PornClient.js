@@ -164,6 +164,7 @@ class PornClient {
     })
   }
 
+  // Aggregate method that dispatches requests to matching adapters
   async _invokeMethod(methodName, rawRequest, idProp) {
     let request = normalizeRequest(rawRequest)
     let adapters = this._getAdaptersForRequest(request)
@@ -184,6 +185,8 @@ class PornClient {
     return mergeResults(results, request.limit)
   }
 
+  // This is a public wrapper around the private method
+  // that implements caching and result normalization
   async invokeMethod(methodName, rawRequest) {
     let { adapterMethod, cacheTtl, idProp, expectsArray } = METHODS[methodName]
     let invokeMethod = async () => {
