@@ -1,4 +1,4 @@
 ./**
-!dist
-!static
+!dist/**
+!static/**
 !package.json
