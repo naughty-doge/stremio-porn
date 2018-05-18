@@ -45,12 +45,18 @@ Watch porn videos and webcam streams from ${availableSites}\
   idProperty: PornClient.ID,
   dontAnnounce: !IS_PROD,
   sorts: PornClient.SORTS,
+  // The docs mention `contactEmail`, but the template uses `email`
   email: EMAIL,
-  contactEmail: EMAIL, // The docs mention this property, but it seems incorrect
+  contactEmail: EMAIL,
   endpoint: ENDPOINT,
   logo: `${ENDPOINT}/logo.png`,
   icon: `${ENDPOINT}/logo.png`,
   background: `${ENDPOINT}/bg.jpg`,
+  // OBSOLETE: used in pre-4.0 stremio instead of idProperty/types
+  filter: {
+    [`query.${PornClient.ID}`]: { $exists: true },
+    'query.type': { $in: ['movie', 'tv'] },
+  },
 }
 
 
@@ -110,7 +116,7 @@ server
 
     // eslint-disable-next-line no-console
     console.log(`
-    Porn Addon is live
+    ${MANIFEST.name} Addon is live
 
     Endpoint:    ${values.endpoint}
     Addon Id:    ${values.id}
@@ -121,5 +127,6 @@ server
     `)
   })
   .listen(PORT)
+
 
 export default server
