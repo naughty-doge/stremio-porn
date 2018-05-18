@@ -61,7 +61,7 @@ describe('Addon @integration', () => {
 
   beforeAll(() => {
     addonClient = new AddonClient()
-    addonClient.add('http://localhost:8008')
+    addonClient.add('http://localhost:80')
   })
 
   beforeEach(() => {
@@ -73,9 +73,9 @@ describe('Addon @integration', () => {
     return addon.stop()
   })
 
-  test('When a port is not specified, starts a web server on port 8008', async () => {
+  test('When a port is not specified, starts a web server on port 80', async () => {
     await addon.start()
-    expect(addon.server.address().port).toBe(8008)
+    expect(addon.server.address().port).toBe(80)
   })
 
   test('When a port is specified, starts a web server on it', async () => {
@@ -119,7 +119,7 @@ describe('Addon @integration', () => {
   test('The main page is accessible', async () => {
     await addon.start()
     let res = await new Promise((resolve) => {
-      get('http://localhost:8008', resolve)
+      get('http://localhost:80', resolve)
     })
     expect(res.statusCode).toBe(200)
   })
@@ -133,7 +133,7 @@ describe('Addon @integration', () => {
     ]
     let promises = staticFiles.map((file) => {
       return new Promise((resolve) => {
-        get(`http://localhost:8008/${file}`, resolve)
+        get(`http://localhost:80/${file}`, resolve)
       })
     })
     let responses = await Promise.all(promises)
