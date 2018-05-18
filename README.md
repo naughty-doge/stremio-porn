@@ -20,6 +20,8 @@ This is a [Stremio](https://www.stremio.com/) addon that provides porn content f
 - Caches results in memory or Redis
 - Supports HTTPS proxy
 - Configurable via environment variables
+- Prints a nicely formatted status message when run
+- The logo is dope 🗡💖
 
 
 ## Running
@@ -41,6 +43,8 @@ In order for the addon to work publicly, the following environment variables mus
 - `NODE_ENV` to `production`
 - `STREMIO_PORN_ENDPOINT` to a public URL of the server
 - `STREMIO_PORN_ID` to a non-default value
+
+Note: since this addon scrapes pages, it is recommended to run it behind a proxy and use Redis caching.
 
 
 ## npm scripts
@@ -70,6 +74,8 @@ To configure the addon, set the following environment variables before running i
 - `STREMIO_PORN_EMAIL` — email address that can be used to contact you (unset by default)
 - `STREMIO_PORN_PROXY` — HTTPS proxy address to route all the outbound requests to (unset by default)
 - `STREMIO_PORN_CACHE` — 0 to turn caching off, 1 to cache in memory, or a Redis URL (e.g. `redis://example.com:6379`) to cache in Redis (defaults to 1)
+
+When run in Docker using the npm scripts, the variables from the current shell are passed to the Docker container.
 
 
 ## Screenshots
