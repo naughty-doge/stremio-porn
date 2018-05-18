@@ -14,10 +14,10 @@ const DEFAULT_ID = 'stremio_porn'
 
 const ID = process.env.STREMIO_PORN_ID || DEFAULT_ID
 const ENDPOINT = process.env.STREMIO_PORN_ENDPOINT || 'http://localhost'
-const PORT = process.env.STREMIO_PORN_PORT || '8008'
-const PROXY = process.env.STREMIO_PORN_PROXY
-const CACHE = process.env.STREMIO_PORN_CACHE || '1'
-const EMAIL = process.env.STREMIO_PORN_EMAIL
+const PORT = process.env.STREMIO_PORN_PORT || process.env.PORT || '80'
+const PROXY = process.env.STREMIO_PORN_PROXY || process.env.HTTPS_PROXY
+const CACHE = process.env.STREMIO_PORN_CACHE || process.env.REDIS_URL || '1'
+const EMAIL = process.env.STREMIO_PORN_EMAIL || process.env.EMAIL
 const IS_PROD = process.env.NODE_ENV === 'production'
 
 
@@ -116,7 +116,7 @@ server
 
     // eslint-disable-next-line no-console
     console.log(`
-    ${MANIFEST.name} Addon is live
+    ${MANIFEST.name} Addon is listening on port ${PORT}
 
     Endpoint:    ${values.endpoint}
     Addon Id:    ${values.id}
