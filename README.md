@@ -77,7 +77,7 @@ To configure the addon, set the following environment variables before running i
 
 - `NODE_ENV` — when set to `production`, the addon will announce its endpoint to the Stremio addon tracker
 - `STREMIO_PORN_ID` — addon identifier, must be non-default in production mode (defaults to `stremio_porn`)
-- `STREMIO_PORN_ENDPOINT` — URL to use as the endpoint, must be public in production mode (defaults to `http://localhost`)
+- `STREMIO_PORN_ENDPOINT` — base URL to use as the endpoint, must be public in production mode (defaults to `http://localhost`)
 - `STREMIO_PORN_PORT` — port to listen to (defaults to `80`)
 - `STREMIO_PORN_EMAIL` — email address that can be used to contact you (unset by default)
 - `STREMIO_PORN_PROXY` — HTTPS proxy address to route all the outbound requests to (unset by default)

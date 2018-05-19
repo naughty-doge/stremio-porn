@@ -48,7 +48,7 @@ Watch porn videos and webcam streams from ${availableSites}\
   // The docs mention `contactEmail`, but the template uses `email`
   email: EMAIL,
   contactEmail: EMAIL,
-  endpoint: ENDPOINT,
+  endpoint: `${ENDPOINT}/stremioget/stremio/v1`,
   logo: `${ENDPOINT}/logo.png`,
   icon: `${ENDPOINT}/logo.png`,
   background: `${ENDPOINT}/bg.jpg`,
