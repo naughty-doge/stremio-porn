@@ -61,7 +61,7 @@ describe('Addon @integration', () => {
 
   beforeAll(() => {
     addonClient = new AddonClient()
-    addonClient.add('http://localhost:80')
+    addonClient.add('http://localhost')
   })
 
   beforeEach(() => {
@@ -119,7 +119,7 @@ describe('Addon @integration', () => {
   test('The main page is accessible', async () => {
     await addon.start()
     let res = await new Promise((resolve) => {
-      get('http://localhost:80', resolve)
+      get('http://localhost', resolve)
     })
     expect(res.statusCode).toBe(200)
   })
@@ -133,7 +133,7 @@ describe('Addon @integration', () => {
     ]
     let promises = staticFiles.map((file) => {
       return new Promise((resolve) => {
-        get(`http://localhost:80/${file}`, resolve)
+        get(`http://localhost/${file}`, resolve)
       })
     })
     let responses = await Promise.all(promises)

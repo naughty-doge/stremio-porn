@@ -26,7 +26,8 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "testRegex": "tests/.*\\.test\\.js$"
+    "testRegex": "tests/.*\\.test\\.js$",
+    "forceExit": true
   },
   "babel": {
     "presets": [
