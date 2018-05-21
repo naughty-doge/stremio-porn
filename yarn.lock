@@ -1092,6 +1092,10 @@ boom@5.x.x:
   dependencies:
     hoek "4.x.x"
 
+bottleneck@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/bottleneck/-/bottleneck-2.3.1.tgz#16292092ff040ccbf2d05d0a09d69eab7b1c46bc"
+
 brace-expansion@^1.1.7:
   version "1.1.11"
   resolved "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-1.1.11.tgz#3c7fcbf529d87226f3d2f52b966ff5271eb441dd"

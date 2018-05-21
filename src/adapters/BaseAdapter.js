@@ -1,12 +1,19 @@
+import Bottleneck from 'bottleneck'
+
+
 // Contains some common methods as well as public wrappers
 // that prepare requests, redirect them to private methods
 // and normalize results
 class BaseAdapter {
   static SUPPORTED_TYPES = []
   static MAX_RESULTS_PER_REQUEST = 100
+  static MAX_CONCURRENT_REQUESTS = 3
 
   constructor(httpClient) {
     this.httpClient = httpClient
+    this.scheduler = new Bottleneck({
+      maxConcurrent: this.constructor.MAX_CONCURRENT_REQUESTS,
+    })
   }
 
   _normalizeItem(item) {
@@ -73,7 +80,9 @@ class BaseAdapter {
     this._validateRequest(request)
 
     let pagination = this._paginate(request)
-    let results = await this._find(request.query, pagination)
+    let results = await this.scheduler.schedule(() => {
+      return this._find(request.query, pagination)
+    })
 
     if (results) {
       return results.map((item) => this._normalizeItem(item))
@@ -86,7 +95,9 @@ class BaseAdapter {
     this._validateRequest(request)
 
     let { type, id } = request.query
-    let result = await this._getItem(type, id)
+    let result = await this.scheduler.schedule(() => {
+      return this._getItem(type, id)
+    })
     return result ? [this._normalizeItem(result)] : []
   }
 
@@ -94,7 +105,9 @@ class BaseAdapter {
     this._validateRequest(request)
 
     let { type, id } = request.query
-    let results = await this._getStreams(type, id)
+    let results = await this.scheduler.schedule(() => {
+      return this._getStreams(type, id)
+    })
 
     if (results) {
       return results.map((stream) => this._normalizeStream(stream))

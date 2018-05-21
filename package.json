@@ -73,6 +73,7 @@
     "rimraf": "^2.6.2"
   },
   "dependencies": {
+    "bottleneck": "^2.3.1",
     "cache-manager": "^2.9.0",
     "cache-manager-redis-store": "^1.4.0",
     "chalk": "^2.4.1",
