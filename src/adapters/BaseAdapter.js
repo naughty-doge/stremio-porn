@@ -3,6 +3,7 @@
 // and normalize results
 class BaseAdapter {
   static SUPPORTED_TYPES = []
+  static MAX_RESULTS_PER_REQUEST = 100
 
   constructor(httpClient) {
     this.httpClient = httpClient
@@ -20,11 +21,12 @@ class BaseAdapter {
     }
   }
 
-  _paginate(request, itemsPerPage = this.constructor.ITEMS_PER_PAGE) {
-    let {
-      skip = 0,
-      limit = itemsPerPage,
-    } = request
+  _paginate(request) {
+    let itemsPerPage = this.constructor.ITEMS_PER_PAGE || Infinity
+    let { skip = 0, limit = itemsPerPage } = request
+    limit = Math.min(limit, this.constructor.MAX_RESULTS_PER_REQUEST)
+    itemsPerPage = Math.min(itemsPerPage, limit)
+
     let firstPage = Math.ceil((skip + 0.1) / itemsPerPage) || 1
     let pageCount = Math.ceil(limit / itemsPerPage)
     let pages = []
@@ -57,12 +59,7 @@ class BaseAdapter {
   }
 
   async _find(query, pagination) {
-    let {
-      pages,
-      limit = Infinity,
-      skipOnFirstPage = 0,
-    } = pagination
-
+    let { pages, limit, skipOnFirstPage } = pagination
     let requests = pages.map((page) => {
       return this._findByPage(query, page)
     })
