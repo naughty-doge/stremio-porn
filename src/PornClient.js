@@ -14,6 +14,7 @@ import Chaturbate from './adapters/Chaturbate'
 
 const ID = 'porn_id'
 const SORT_PROP_PREFIX = 'popularities.porn.'
+const CACHE_PREFIX = 'stremio-porn|'
 const MAX_ADAPTERS_PER_REQUEST = 1
 const ADAPTERS = [PornHub, RedTube, YouPorn, SpankWire, PornCom, Chaturbate]
 const SORTS = ADAPTERS.map(({ name, DISPLAY_NAME, SUPPORTED_TYPES }) => ({
@@ -196,7 +197,7 @@ class PornClient {
     }
 
     if (this.cache) {
-      let cacheKey = JSON.stringify(rawRequest)
+      let cacheKey = CACHE_PREFIX + JSON.stringify(rawRequest)
       let cacheOptions = {
         ttl: cacheTtl,
       }
