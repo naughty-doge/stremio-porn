@@ -35,6 +35,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 // import EPorner from './adapters/EPorner'
 const ID = 'porn_id';
 const SORT_PROP_PREFIX = 'popularities.porn.';
+const CACHE_PREFIX = 'stremio-porn|';
 const MAX_ADAPTERS_PER_REQUEST = 1;
 const ADAPTERS = [_PornHub.default, _RedTube.default, _YouPorn.default, _SpankWire.default, _PornCom.default, _Chaturbate.default];
 const SORTS = ADAPTERS.map(({
@@ -260,7 +261,7 @@ class PornClient {
       }();
 
       if (_this2.cache) {
-        let cacheKey = JSON.stringify(rawRequest);
+        let cacheKey = CACHE_PREFIX + JSON.stringify(rawRequest);
         let cacheOptions = {
           ttl: cacheTtl
         };
