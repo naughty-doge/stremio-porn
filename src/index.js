@@ -72,8 +72,10 @@ function makeMethod(client, methodName) {
 
       /* eslint-disable no-console */
       console.error(
-        'An error has occurred while processing ' +
-          `the following request to ${methodName}:`
+        // eslint-disable-next-line prefer-template
+        chalk.gray(new Date().toLocaleString()) +
+        ' An error has occurred while processing ' +
+        `the following request to ${methodName}:`
       )
       console.error(request)
       console.error(err)
