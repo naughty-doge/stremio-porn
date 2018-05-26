@@ -48,19 +48,22 @@ class BaseAdapter {
     }
   }
 
-  _validateRequest(request) {
-    let type = typeof request
+  _validateRequest(request, typeRequired) {
     let { SUPPORTED_TYPES } = this.constructor
 
-    if (type !== 'object') {
-      throw new Error(`A request must be an object, ${type} given`)
+    if (typeof request !== 'object') {
+      throw new Error(`A request must be an object, ${typeof request} given`)
     }
 
     if (!request.query) {
       throw new Error('Request query must not be empty')
     }
 
-    if (!SUPPORTED_TYPES.includes(request.query.type)) {
+    if (typeRequired && !request.query.type) {
+      throw new Error('Content type must be specified')
+    }
+
+    if (request.query.type && !SUPPORTED_TYPES.includes(request.query.type)) {
       throw new Error(`Content type ${request.query.type} is not supported`)
     }
   }
@@ -80,8 +83,17 @@ class BaseAdapter {
     this._validateRequest(request)
 
     let pagination = this._paginate(request)
+    let { query } = request
+
+    if (!query.type) {
+      query = {
+        ...query,
+        type: this.constructor.SUPPORTED_TYPES[0],
+      }
+    }
+
     let results = await this.scheduler.schedule(() => {
-      return this._find(request.query, pagination)
+      return this._find(query, pagination)
     })
 
     if (results) {
@@ -92,7 +104,7 @@ class BaseAdapter {
   }
 
   async getItem(request) {
-    this._validateRequest(request)
+    this._validateRequest(request, true)
 
     let { type, id } = request.query
     let result = await this.scheduler.schedule(() => {
@@ -102,7 +114,7 @@ class BaseAdapter {
   }
 
   async getStreams(request) {
-    this._validateRequest(request)
+    this._validateRequest(request, true)
 
     let { type, id } = request.query
     let results = await this.scheduler.schedule(() => {
