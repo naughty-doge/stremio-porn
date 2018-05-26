@@ -86,9 +86,10 @@ class HubTrafficAdapter extends _BaseAdapter.default {
 
       let {
         body
-      } = yield _this.httpClient.request(url, options);
+      } = yield _this.httpClient.request(url, options); // Ignore "No Videos found!"" and "No video with this ID." errors
+      // eslint-disable-next-line eqeqeq
 
-      if (body.code) {
+      if (body.code && body.code != 2001 && body.code != 2002) {
         let err = new Error(body.message);
         err.code = Number(body.code);
         throw err;
@@ -102,6 +103,9 @@ class HubTrafficAdapter extends _BaseAdapter.default {
     var _this2 = this;
 
     return _asyncToGenerator(function* () {
+      let {
+        ITEMS_PER_PAGE
+      } = _this2.constructor;
       let newQuery = {
         'tags[]': query.genre,
         search: query.search,
@@ -110,23 +114,14 @@ class HubTrafficAdapter extends _BaseAdapter.default {
         thumbsize: 'medium',
         page
       };
-      let videos = [];
+      let result = yield _this2._requestApi('searchVideos', newQuery);
+      let videos = result.videos || result.video || []; // We retry with the monthly period in case there are too few weekly videos
 
-      try {
-        let result = yield _this2._requestApi('searchVideos', newQuery);
-        videos = result.videos || result.video || [];
-      } catch (err) {
-        // eslint-disable-next-line eqeqeq
-        if (err.code != 2001 && err.message !== 'No Videos found!') {
-          throw err;
-        }
-      } // We retry with the monthly period in case there are too few weekly videos
-
-
-      if (page === 1 && videos.length < _this2.constructor.ITEMS_PER_PAGE) {
+      if (!query.search && page === 1 && videos.length < ITEMS_PER_PAGE) {
         newQuery.period = 'monthly';
         let result = yield _this2._requestApi('searchVideos', newQuery);
-        videos = result.videos || result.video;
+        let monthlyVideos = result.videos || result.video || [];
+        videos = videos.concat(monthlyVideos).slice(0, ITEMS_PER_PAGE);
       }
 
       return videos;
@@ -140,16 +135,7 @@ class HubTrafficAdapter extends _BaseAdapter.default {
       let query = {
         [_this3.constructor.VIDEO_ID_PARAMETER]: id
       };
-
-      try {
-        return yield _this3._requestApi('getVideoById', query);
-      } catch (err) {
-        // Ignore the "No video with this ID." error
-        // eslint-disable-next-line eqeqeq
-        if (err.code != 2002) {
-          throw err;
-        }
-      }
+      return _this3._requestApi('getVideoById', query);
     })();
   }
 

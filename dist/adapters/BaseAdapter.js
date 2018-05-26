@@ -64,21 +64,24 @@ class BaseAdapter {
     };
   }
 
-  _validateRequest(request) {
-    let type = typeof request;
+  _validateRequest(request, typeRequired) {
     let {
       SUPPORTED_TYPES
     } = this.constructor;
 
-    if (type !== 'object') {
-      throw new Error(`A request must be an object, ${type} given`);
+    if (typeof request !== 'object') {
+      throw new Error(`A request must be an object, ${typeof request} given`);
     }
 
     if (!request.query) {
       throw new Error('Request query must not be empty');
     }
 
-    if (!SUPPORTED_TYPES.includes(request.query.type)) {
+    if (typeRequired && !request.query.type) {
+      throw new Error('Content type must be specified');
+    }
+
+    if (request.query.type && !SUPPORTED_TYPES.includes(request.query.type)) {
       throw new Error(`Content type ${request.query.type} is not supported`);
     }
   }
@@ -109,8 +112,18 @@ class BaseAdapter {
 
       let pagination = _this2._paginate(request);
 
+      let {
+        query
+      } = request;
+
+      if (!query.type) {
+        query = _objectSpread({}, query, {
+          type: _this2.constructor.SUPPORTED_TYPES[0]
+        });
+      }
+
       let results = yield _this2.scheduler.schedule(() => {
-        return _this2._find(request.query, pagination);
+        return _this2._find(query, pagination);
       });
 
       if (results) {
@@ -125,7 +138,7 @@ class BaseAdapter {
     var _this3 = this;
 
     return _asyncToGenerator(function* () {
-      _this3._validateRequest(request);
+      _this3._validateRequest(request, true);
 
       let {
         type,
@@ -142,7 +155,7 @@ class BaseAdapter {
     var _this4 = this;
 
     return _asyncToGenerator(function* () {
-      _this4._validateRequest(request);
+      _this4._validateRequest(request, true);
 
       let {
         type,

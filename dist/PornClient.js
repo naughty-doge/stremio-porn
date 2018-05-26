@@ -35,7 +35,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 // import EPorner from './adapters/EPorner'
 const ID = 'porn_id';
 const SORT_PROP_PREFIX = 'popularities.porn.';
-const CACHE_PREFIX = 'stremio-porn|';
+const CACHE_PREFIX = 'stremio-porn|'; // Making multiple requests to multiple adapters for different types
+// and then aggregating them is a lot of work,
+// so we only support 1 adapter per request for now.
+
 const MAX_ADAPTERS_PER_REQUEST = 1;
 const ADAPTERS = [_PornHub.default, _RedTube.default, _YouPorn.default, _SpankWire.default, _PornCom.default, _Chaturbate.default];
 const SORTS = ADAPTERS.map(({
@@ -101,13 +104,8 @@ function normalizeRequest(request) {
   }
 
   if (typeof query === 'string') {
-    // Search requests are troublesome because they don't have a type specified,
-    // and making multiple requests to multiple adapters for different types
-    // and then aggregating them is a lot of work.
-    // So we only support searching for movies for now.
     query = {
-      search: query,
-      type: 'movie'
+      search: query
     };
   } else if (query) {
     query = _objectSpread({}, query);
