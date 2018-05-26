@@ -89,6 +89,7 @@ class HubTrafficAdapter extends BaseAdapter {
   }
 
   async _findByPage(query, page) {
+    let { ITEMS_PER_PAGE } = this.constructor
     let newQuery = {
       'tags[]': query.genre,
       search: query.search,
@@ -102,10 +103,11 @@ class HubTrafficAdapter extends BaseAdapter {
     let videos = result.videos || result.video || []
 
     // We retry with the monthly period in case there are too few weekly videos
-    if (page === 1 && videos.length < this.constructor.ITEMS_PER_PAGE) {
+    if (!query.search && page === 1 && videos.length < ITEMS_PER_PAGE) {
       newQuery.period = 'monthly'
       let result = await this._requestApi('searchVideos', newQuery)
-      videos = result.videos || result.video
+      let monthlyVideos = result.videos || result.video || []
+      videos = videos.concat(monthlyVideos).slice(0, ITEMS_PER_PAGE)
     }
 
     return videos
