@@ -1,6 +1,6 @@
 {
   "name": "stremio-porn",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Stremio addon that provides videos and webcam streams from various porn sites",
   "author": "Naughty Doge <naughty-doge@protonmail.com>",
   "scripts": {
