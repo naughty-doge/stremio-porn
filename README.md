@@ -18,6 +18,7 @@ This is a [Stremio](https://www.stremio.com/) addon that provides porn content f
 - Works in Stremio v4 and v3.6
 - Supports Docker out of the box
 - Caches results in memory or Redis
+- Limits the number of concurrent requests to avoid overloading the sites
 - Supports HTTPS proxy
 - Configurable via environment variables
 - Prints a nicely formatted status message when run
