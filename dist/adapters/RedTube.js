@@ -25,7 +25,7 @@ class RedTube extends _HubTrafficAdapter.default {
     /* eslint-disable max-len */
     // URL example:
     // https://ce.rdtcdn.com/media/videos/201803/12/4930561/480P_600K_4930561.mp4?a5dcae8e1adc0bdaed975f0...
-    let regexp = /videoUrl["']?\s*:\s*["']?(https?:\\?\/\\?\/[a-z]+\.rdtcdn\.com[^"']+)/gi;
+    let regexp = /videoUrl["']?\s*:\s*["']?(https?:\\?\/\\?\/[a-z_-]+\.rdtcdn\.com[^"']+)/gi;
     /* eslint-enable max-len */
 
     let urlMatches = regexp.exec(body);

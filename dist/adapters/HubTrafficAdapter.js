@@ -114,11 +114,10 @@ class HubTrafficAdapter extends _BaseAdapter.default {
 
       try {
         let result = yield _this2._requestApi('searchVideos', newQuery);
-        videos = result.videos || result.video;
+        videos = result.videos || result.video || [];
       } catch (err) {
-        // Ignore the "No Videos found!" error
         // eslint-disable-next-line eqeqeq
-        if (err.code != 2001) {
+        if (err.code != 2001 && err.message !== 'No Videos found!') {
           throw err;
         }
       } // We retry with the monthly period in case there are too few weekly videos
