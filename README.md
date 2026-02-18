@@ -52,6 +52,33 @@ In order for the addon to work publicly, the following environment variables mus
 Note: since this addon scrapes pages, it is recommended to run it behind a proxy and use Redis caching.
 
 
+## Docker
+
+A pre-built Docker image is available on GitHub Container Registry (GHCR):
+
+```bash
+docker pull ghcr.io/varkhir/stremio-porn:latest
+```
+
+You can run it directly:
+
+```bash
+docker run -p 8080:8080 ghcr.io/varkhir/stremio-porn:latest
+```
+
+Or use it in a `docker-compose.yml`:
+
+```yaml
+services:
+  stremio-porn:
+    image: ghcr.io/varkhir/stremio-porn:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - STREMIO_PORN_PORT=8080
+```
+
+
 ## Debrid Services
 
 Debrid services (Real-Debrid and Torbox) can be configured directly from the web UI — no environment variables needed. Open the addon's landing page in a browser, enter your API tokens, and click **"Update Install URL"**. A personalized addon URL is generated with your tokens encoded in it. Use that URL to install the addon in Stremio.
@@ -115,4 +142,4 @@ These common environment variables are used as fallbacks when the `STREMIO_PORN_
 
 ## Screenshots
 
-![Discover](/static/screenshot_discover.jpg)
+![Discover](https://github.com/user-attachments/assets/fefa2721-a273-44a7-9ee6-46a249edb70a)
