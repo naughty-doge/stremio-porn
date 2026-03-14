@@ -1,4 +1,5 @@
 import http from 'http'
+import { parse as parseUrl } from 'url'
 import Stremio from 'stremio-addons'
 import serveStatic from 'serve-static'
 import chalk from 'chalk'
@@ -60,6 +61,40 @@ Watch porn videos and webcam streams from ${availableSites}\
 }
 
 
+// Manifest for the new Stremio addon SDK REST API (v4.4+)
+const SDK_CATALOGS = PornClient.ADAPTERS.reduce((catalogs, Adapter) => {
+  Adapter.SUPPORTED_TYPES.forEach((type) => {
+    catalogs.push({
+      type,
+      id: Adapter.name,
+      name: `Porn: ${Adapter.DISPLAY_NAME}`,
+    })
+  })
+  return catalogs
+}, [])
+
+const SDK_MANIFEST = {
+  id: ID,
+  version: pkg.version,
+  name: MANIFEST.name,
+  description: MANIFEST.description,
+  logo: MANIFEST.logo,
+  background: MANIFEST.background,
+  resources: ['catalog', 'meta', 'stream'],
+  types: ['movie', 'tv'],
+  idPrefixes: [`${PornClient.ID}:`],
+  catalogs: SDK_CATALOGS,
+}
+
+function sendJson(res, data) {
+  let body = JSON.stringify(data)
+  res.setHeader('Content-Type', 'application/json')
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Content-Length', Buffer.byteLength(body, 'utf8'))
+  res.end(body)
+}
+
+
 function makeMethod(client, methodName) {
   return async (request, cb) => {
     let response
@@ -98,6 +133,51 @@ let client = new PornClient({ proxy: PROXY, cache: CACHE })
 let methods = makeMethods(client, SUPPORTED_METHODS)
 let addon = new Stremio.Server(methods, MANIFEST)
 let server = http.createServer((req, res) => {
+  let { pathname } = parseUrl(req.url)
+
+  if (req.method === 'GET') {
+    // New Stremio addon SDK (v4.4+) REST API endpoints.
+    // The old stremio-addons middleware returns the HTML landing page for any
+    // GET request whose path doesn't end in "q.json", so we handle these
+    // routes before the old middleware can intercept them.
+
+    if (pathname === '/manifest.json') {
+      sendJson(res, SDK_MANIFEST)
+      return
+    }
+
+    let streamMatch = pathname.match(/^\/stream\/([^/]+)\/(.+)\.json$/)
+    if (streamMatch) {
+      let type = streamMatch[1]
+      let id = decodeURIComponent(streamMatch[2])
+      client.invokeMethod('stream.find', { query: { [PornClient.ID]: id, type } })
+        .then((streams) => sendJson(res, { streams: streams || [] }))
+        .catch(() => sendJson(res, { streams: [] }))
+      return
+    }
+
+    let metaMatch = pathname.match(/^\/meta\/([^/]+)\/(.+)\.json$/)
+    if (metaMatch) {
+      let type = metaMatch[1]
+      let id = decodeURIComponent(metaMatch[2])
+      client.invokeMethod('meta.get', { query: { [PornClient.ID]: id, type } })
+        .then((meta) => sendJson(res, { meta: meta || null }))
+        .catch(() => sendJson(res, { meta: null }))
+      return
+    }
+
+    let catalogMatch = pathname.match(/^\/catalog\/([^/]+)\/([^/]+)\.json$/)
+    if (catalogMatch) {
+      let type = catalogMatch[1]
+      let catalogId = catalogMatch[2]
+      let sort = { [`popularities.porn.${catalogId}`]: -1 }
+      client.invokeMethod('meta.find', { query: { type }, sort })
+        .then((metas) => sendJson(res, { metas: metas || [] }))
+        .catch(() => sendJson(res, { metas: [] }))
+      return
+    }
+  }
+
   serveStatic(STATIC_DIR)(req, res, () => {
     addon.middleware(req, res, () => res.end())
   })

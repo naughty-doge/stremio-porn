@@ -18,7 +18,9 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 const DEFAULT_HEADERS = {
-  'user-agent': 'stremio-porn'
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+  'accept-language': 'en-US,en;q=0.9',
+  accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
 };
 const DEFAULT_REQUEST_OPTIONS = {
   timeout: 20000
@@ -29,15 +31,9 @@ class HttpClient {
     _defineProperty(this, "baseRequestOptions", _objectSpread({}, DEFAULT_REQUEST_OPTIONS));
 
     if (options.proxy) {
-      let [host, port] = options.proxy.split(':');
-      let agentOptions = {
-        host,
-        port,
-        secureProxy: true
-      };
       this.baseRequestOptions.agent = {
-        http: new _httpProxyAgent.default(agentOptions),
-        https: new _httpsProxyAgent.default(agentOptions)
+        http: new _httpProxyAgent.default(options.proxy),
+        https: new _httpsProxyAgent.default(options.proxy)
       };
     }
   }

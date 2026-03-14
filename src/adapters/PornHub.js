@@ -19,28 +19,30 @@ class PornHub extends HubTrafficAdapter {
   }
 
   _extractStreamsFromEmbed(body) {
-    /* eslint-disable max-len */
-    // URL example:
-    // https:\/\/de.phncdn.com\/videos\/201503\/28\/46795732\/vl_480_493k_46795732.mp4?ttl=1522227092&ri=1228800&rs=696&hash=268b5f4d76927209ef554ac9e93c6c85
-    let regexp = /videoUrl["']?\s*:\s*["']?(https?:\\?\/\\?\/[a-z]+\.phncdn\.com[^"']+)/gi
-    /* eslint-enable max-len */
-    let urlMatches = regexp.exec(body)
+  // Try multiple patterns for different PornHub embed formats
+    let patterns = [
+      /videoUrl["']?\s*:\s*["']?(https?:\\?\/\\?\/[^"',\s]+\.mp4[^"',\s]*)/gi,
+      /"url"\s*:\s*"(https?:[^"]+\.mp4[^"]*)"/gi,
+      /setVideoHLS\(['"]([^'"]+)['"]\)/gi,
+      /hlsManifestUrl["']?\s*:\s*["']?([^"',\s]+)/gi,
+    ]
 
-    if (!urlMatches || !urlMatches[1]) {
-      throw new Error('Unable to extract a stream URL from an embed page')
+    for (let regexp of patterns) {
+      let match = regexp.exec(body)
+      if (match && match[1]) {
+        let url = match[1]
+          .replace(/\\\/\\/g, '/')
+          .replace(/[\\/]+/g, '/')
+          .replace(/(https?:\/)/, '$1/')
+        if (url[0] === '/') {
+          url = `https:/${url}`
+        }
+        return [{ url }]
+      }
     }
 
-    let url = urlMatches[1]
-      .replace(/[\\/]+/g, '/') // Normalize the slashes...
-      .replace(/(https?:\/)/, '$1/') // ...but keep the // after "https:"
-
-    if (url[0] === '/') {
-      url = `https:/${url}`
-    }
-
-    return [{ url }]
+    throw new Error('Unable to extract a stream URL from an embed page')
   }
 }
-
 
 export default PornHub
