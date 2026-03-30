@@ -32,7 +32,7 @@ class SpankWire extends _HubTrafficAdapter.default {
     let urlMatches = body.match(urlRegexp);
 
     if (!urlMatches || !urlMatches.length) {
-      throw new Error('Unable to extract streams from an embed page');
+      return [];
     }
 
     return urlMatches.map(item => {

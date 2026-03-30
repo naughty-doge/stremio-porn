@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoonHub - Addon for Stremio</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #0a0a1a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero {
+      width: 100%;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+      border-bottom: 2px solid #e94560;
+    }
+
+    .hero img {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      margin-bottom: 1rem;
+    }
+
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      color: #b0b0c0;
+      max-width: 600px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .install-btn {
+      display: inline-block;
+      background: #e94560;
+      color: #fff;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      transition: background 0.2s, transform 0.1s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .install-btn:hover {
+      background: #c73852;
+      transform: translateY(-1px);
+    }
+
+    .install-btn:active {
+      transform: translateY(0);
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      padding: 2rem 1rem;
+    }
+
+    .section {
+      background: #12122a;
+      border: 1px solid #2a2a4a;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section h2 {
+      font-size: 1.3rem;
+      color: #e94560;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section h2 .icon {
+      font-size: 1.4rem;
+    }
+
+    .catalogs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .catalog-card {
+      background: #1a1a3a;
+      border: 1px solid #2a2a5a;
+      border-radius: 8px;
+      padding: 1rem;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+
+    .catalog-card:hover {
+      border-color: #e94560;
+      transform: translateY(-2px);
+    }
+
+    .catalog-card h3 {
+      font-size: 1rem;
+      color: #ffffff;
+      margin-bottom: 0.3rem;
+    }
+
+    .catalog-card .type-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .type-movie {
+      background: #e94560;
+      color: #fff;
+    }
+
+    .type-tv {
+      background: #0f3460;
+      color: #b0d0ff;
+    }
+
+    .catalog-card .features {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: #8888aa;
+    }
+
+    .config-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .config-table th,
+    .config-table td {
+      text-align: left;
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid #2a2a4a;
+      font-size: 0.9rem;
+    }
+
+    .config-table th {
+      color: #e94560;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .config-table td {
+      color: #b0b0c0;
+    }
+
+    .config-table code {
+      background: #1a1a3a;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: #e0e0ff;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-item .label {
+      font-size: 0.85rem;
+      color: #8888aa;
+    }
+
+    .status-item .value {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .status-on { color: #4caf50; }
+    .status-off { color: #f44336; }
+    .status-info { color: #64b5f6; }
+
+    .footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: #555;
+      font-size: 0.85rem;
+    }
+
+    .footer a {
+      color: #e94560;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .manifest-url {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    .manifest-url input {
+      flex: 1;
+      background: #1a1a3a;
+      border: 1px solid #2a2a5a;
+      color: #e0e0ff;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-family: monospace;
+    }
+
+    .manifest-url button {
+      background: #2a2a5a;
+      color: #e0e0ff;
+      border: 1px solid #3a3a6a;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
+
+    .manifest-url button:hover {
+      background: #3a3a6a;
+    }
+
+    .debrid-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .debrid-form .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .debrid-form label {
+      font-size: 0.9rem;
+      color: #b0b0c0;
+      font-weight: 600;
+    }
+
+    .debrid-form .field-hint {
+      font-size: 0.8rem;
+      color: #6a6a8a;
+    }
+
+    .debrid-form input[type="text"],
+    .debrid-form input[type="password"] {
+      background: #1a1a3a;
+      border: 1px solid #2a2a5a;
+      color: #e0e0ff;
+      padding: 0.6rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-family: monospace;
+      width: 100%;
+      transition: border-color 0.2s;
+    }
+
+    .debrid-form input[type="text"]:focus,
+    .debrid-form input[type="password"]:focus {
+      border-color: #e94560;
+      outline: none;
+    }
+
+    .debrid-form .update-btn {
+      background: #e94560;
+      color: #fff;
+      padding: 0.6rem 1.5rem;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      align-self: flex-start;
+    }
+
+    .debrid-form .update-btn:hover {
+      background: #c73852;
+    }
+
+    .debrid-notice {
+      font-size: 0.85rem;
+      color: #8888aa;
+      margin-top: 0.5rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 1.5rem; }
+      .catalogs-grid { grid-template-columns: 1fr; }
+      .config-table th, .config-table td { padding: 0.4rem; font-size: 0.8rem; }
+      .manifest-url { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <img src="/logo.png" alt="GoonHub Logo">
+    <h1>GoonHub - Addon for Stremio</h1>
+    <p>Watch porn videos and webcam streams from PornHub, RedTube, YouPorn, SpankWire, Porn.com and Chaturbate.</p>
+    <a id="installBtn" class="install-btn" href="#">Install Addon</a>
+    <div class="manifest-url">
+      <input type="text" id="manifestUrl" readonly value="" placeholder="Loading manifest URL...">
+      <button onclick="copyManifest()">Copy</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="section">
+      <h2><span class="icon">🔑</span> Debrid Services</h2>
+      <p class="debrid-notice">Configure your debrid service API tokens below. When you click "Update Install URL", a personalized addon URL will be generated with your tokens encoded in it. Your tokens are only sent to this addon server, never to third parties. Torbox links are checked for cache availability before unrestricting.</p>
+      <div class="debrid-form" style="margin-top: 1rem;">
+        <div class="field">
+          <label for="realDebridToken">Real-Debrid API Token</label>
+          <span class="field-hint">Get your token from <a href="https://real-debrid.com/apitoken" target="_blank" rel="noopener" style="color:#e94560;">real-debrid.com/apitoken</a></span>
+          <input type="password" id="realDebridToken" placeholder="Enter your Real-Debrid API token (optional)">
+        </div>
+        <div class="field">
+          <label for="torboxToken">Torbox API Token</label>
+          <span class="field-hint">Get your token from <a href="https://torbox.app/settings" target="_blank" rel="noopener" style="color:#e94560;">torbox.app/settings</a></span>
+          <input type="password" id="torboxToken" placeholder="Enter your Torbox API token (optional)">
+        </div>
+        <button class="update-btn" onclick="updateInstallUrl()">Update Install URL</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">📊</span> Status</h2>
+      <div class="status-grid" id="statusGrid">
+        <div class="status-item">
+          <span class="label">Version:</span>
+          <span class="value status-info" id="statusVersion">—</span>
+        </div>
+        <div class="status-item">
+          <span class="label">Environment:</span>
+          <span class="value" id="statusEnv">—</span>
+        </div>
+        <div class="status-item">
+          <span class="label">Cache:</span>
+          <span class="value" id="statusCache">—</span>
+        </div>
+        <div class="status-item">
+          <span class="label">Proxy:</span>
+          <span class="value" id="statusProxy">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">📂</span> Available Catalogs</h2>
+      <div class="catalogs-grid" id="catalogsGrid"></div>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">⚙️</span> Server Configuration (Environment Variables)</h2>
+      <table class="config-table">
+        <tr><th><code>NODE_ENV</code></th><td>Set to <code>production</code> for public use</td></tr>
+        <tr><th><code>GOONHUB_ID</code></th><td>Addon identifier (must be non-default in production)</td></tr>
+        <tr><th><code>GOONHUB_ENDPOINT</code></th><td>Public URL of the server</td></tr>
+        <tr><th><code>GOONHUB_PORT</code></th><td>Port to listen on (default: 80)</td></tr>
+        <tr><th><code>GOONHUB_CACHE</code></th><td>0 = off, 1 = memory cache</td></tr>
+        <tr><th><code>GOONHUB_PROXY</code></th><td>HTTPS proxy address for outbound requests</td></tr>
+        <tr><th><code>GOONHUB_EMAIL</code></th><td>Contact email address</td></tr>
+        <tr><th><code>GOONHUB_USENET_STREAMER</code></th><td>Base URL to a compatible Usenet streaming addon</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Powered by <a href="https://www.stremio.com/" target="_blank" rel="noopener">Stremio</a> &middot;
+    <a href="https://github.com/VarKhir/goonhub" target="_blank" rel="noopener">Source Code</a></p>
+  </div>
+
+  <script>
+    (function() {
+      var endpoint = window.location.origin;
+      var manifestPath = '/manifest.json';
+
+      window._endpoint = endpoint;
+      window._manifestPath = manifestPath;
+
+      updateInstallUrlDisplay('', endpoint, manifestPath);
+
+      fetch('/api/status')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          var manifest = data.manifest;
+          var config = data.config;
+          if (!manifest) return;
+
+          if (manifest.version) {
+            document.getElementById('statusVersion').textContent = 'v' + manifest.version;
+          }
+
+          var envEl = document.getElementById('statusEnv');
+          var isProd = manifest.dontAnnounce === false;
+          envEl.textContent = isProd ? 'Production' : 'Development';
+          envEl.className = 'value ' + (isProd ? 'status-on' : 'status-info');
+
+          var cacheEl = document.getElementById('statusCache');
+          cacheEl.textContent = config.cache ? 'Enabled' : 'Disabled';
+          cacheEl.className = 'value ' + (config.cache ? 'status-on' : 'status-off');
+
+          var proxyEl = document.getElementById('statusProxy');
+          proxyEl.textContent = config.proxy ? 'Enabled' : 'Off';
+          proxyEl.className = 'value ' + (config.proxy ? 'status-on' : 'status-off');
+
+          if (manifest.catalogs && manifest.catalogs.length > 0) {
+            renderCatalogs(manifest.catalogs);
+          }
+        })
+        .catch(function() {
+          document.getElementById('statusVersion').textContent = 'Unavailable';
+        });
+
+      function renderCatalogs(catalogs) {
+        var grid = document.getElementById('catalogsGrid');
+        grid.innerHTML = '';
+
+        catalogs.forEach(function(catalog) {
+          var card = document.createElement('div');
+          card.className = 'catalog-card';
+
+          var typeClass = catalog.type === 'movie' ? 'type-movie' : 'type-tv';
+          var typeLabel = catalog.type === 'movie' ? 'Movies' : 'TV';
+          var extras = (catalog.extraSupported || []).join(', ') || 'None';
+
+          card.innerHTML =
+            '<h3>' + escapeHtml(catalog.name) + '</h3>' +
+            '<span class="type-badge ' + typeClass + '">' + typeLabel + '</span>' +
+            '<div class="features">Supports: ' + escapeHtml(extras) + '</div>';
+
+          grid.appendChild(card);
+        });
+      }
+
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+      }
+    })();
+
+    function updateInstallUrlDisplay(configStr, endpoint, manifestPath) {
+      var prefix = configStr ? '/' + configStr : '';
+      var manifestUrl = endpoint + prefix + manifestPath;
+      var stremioUrl = 'stremio://' + window.location.host + prefix + manifestPath;
+
+      document.getElementById('manifestUrl').value = manifestUrl;
+      document.getElementById('installBtn').href = stremioUrl;
+    }
+
+    function updateInstallUrl() {
+      var rdToken = document.getElementById('realDebridToken').value.trim();
+      var tbToken = document.getElementById('torboxToken').value.trim();
+
+      var config = {};
+      if (rdToken) config.realDebridToken = rdToken;
+      if (tbToken) config.torboxToken = tbToken;
+
+      var configStr = '';
+      if (Object.keys(config).length > 0) {
+        configStr = btoa(JSON.stringify(config))
+          .replace(/\+/g, '-').replace(/\//g, '_');
+      }
+
+      updateInstallUrlDisplay(configStr, window._endpoint, window._manifestPath);
+    }
+
+    function copyManifest() {
+      var input = document.getElementById('manifestUrl');
+      input.select();
+      input.setSelectionRange(0, 99999);
+      try {
+        navigator.clipboard.writeText(input.value);
+      } catch (e) {
+        document.execCommand('copy');
+      }
+    }
+  </script>
+</body>
+</html>

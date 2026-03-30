@@ -27,7 +27,7 @@ class PornHub extends HubTrafficAdapter {
     let urlMatches = regexp.exec(body)
 
     if (!urlMatches || !urlMatches[1]) {
-      throw new Error('Unable to extract a stream URL from an embed page')
+      return []
     }
 
     let url = urlMatches[1]

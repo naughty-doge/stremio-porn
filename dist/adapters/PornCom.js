@@ -9,8 +9,6 @@ var _BaseAdapter = _interopRequireDefault(require("./BaseAdapter"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
-
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 const BASE_URL = 'https://www.porn.com';
@@ -77,77 +75,68 @@ class PornCom extends _BaseAdapter.default {
   }
 
   _extractQualitiesFromEmbedPage(body) {
-    return body.match(/['"]?id['"]?:\s*['"]\d+p['"]/gi) // Find id:"240p"
-    .map(item => item.match(/\d+/)[0]) // Extract 240
-    .filter(quality => Number(quality) < 360); // 360+ are restricted
+    let matches = body.match(/['"]?id['"]?:\s*['"]\d+p['"]/gi); // Find id:"240p"
+
+    if (!matches || !matches.length) {
+      return [];
+    }
+
+    return matches.map(item => {
+      let m = item.match(/\d+/);
+      return m ? m[0] : null;
+    }).filter(quality => quality && Number(quality) < 360); // 360+ are restricted
   }
 
-  _getQualities(id) {
-    var _this = this;
+  async _getQualities(id) {
+    let embedUrl = this._makeEmbedUrl(id);
 
-    return _asyncToGenerator(function* () {
-      let embedUrl = _this._makeEmbedUrl(id);
-
-      let {
-        body
-      } = yield _this.httpClient.request(embedUrl);
-      return _this._extractQualitiesFromEmbedPage(body);
-    })();
+    let {
+      body
+    } = await this.httpClient.request(embedUrl);
+    return this._extractQualitiesFromEmbedPage(body);
   }
 
-  _findByPage(query, page) {
-    var _this2 = this;
+  async _findByPage(query, page) {
+    let options = {
+      json: true,
+      query: {
+        page,
+        limit: ITEMS_PER_PAGE,
+        search: query.search,
+        cats: query.genre
+      }
+    };
+    let {
+      body
+    } = await this.httpClient.request(VIDEOS_API_URL, options);
+    return this._parseApiResponse(body);
+  }
 
-    return _asyncToGenerator(function* () {
-      let options = {
-        json: true,
-        query: {
-          page,
-          limit: ITEMS_PER_PAGE,
-          search: query.search,
-          cats: query.genre
-        }
+  async _getItem(type, id) {
+    let options = {
+      json: true,
+      query: {
+        id,
+        limit: 1
+      }
+    };
+    let {
+      body
+    } = await this.httpClient.request(VIDEOS_API_URL, options);
+    return this._parseApiResponse(body)[0];
+  }
+
+  async _getStreams(type, id) {
+    let qualities = await this._getQualities(id);
+    return qualities.map(quality => {
+      let url = this._makeDownloadUrl(id, quality);
+
+      return {
+        id,
+        url,
+        quality
       };
-      let {
-        body
-      } = yield _this2.httpClient.request(VIDEOS_API_URL, options);
-      return _this2._parseApiResponse(body);
-    })();
-  }
-
-  _getItem(type, id) {
-    var _this3 = this;
-
-    return _asyncToGenerator(function* () {
-      let options = {
-        json: true,
-        query: {
-          id,
-          limit: 1
-        }
-      };
-      let {
-        body
-      } = yield _this3.httpClient.request(VIDEOS_API_URL, options);
-      return _this3._parseApiResponse(body)[0];
-    })();
-  }
-
-  _getStreams(type, id) {
-    var _this4 = this;
-
-    return _asyncToGenerator(function* () {
-      let qualities = yield _this4._getQualities(id);
-      return qualities.map(quality => {
-        let url = _this4._makeDownloadUrl(id, quality);
-
-        return {
-          id,
-          url,
-          quality
-        };
-      });
-    })();
+    });
   }
 
 }

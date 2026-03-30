@@ -1,30 +1,92 @@
 import cacheManager from 'cache-manager'
-import redisStore from 'cache-manager-redis-store'
 import HttpClient from './HttpClient'
+import DebridClient from './DebridClient'
 import PornHub from './adapters/PornHub'
-import RedTube from './adapters/RedTube'
-import YouPorn from './adapters/YouPorn'
-import SpankWire from './adapters/SpankWire'
-import PornCom from './adapters/PornCom'
+import XVideos from './adapters/XVideos'
+import XHamster from './adapters/XHamster'
 import Chaturbate from './adapters/Chaturbate'
+import UsenetStreamer from './adapters/UsenetStreamer'
 
 // EPorner has restricted video downloads to 30 per day per guest
 // import EPorner from './adapters/EPorner'
 
+// RedTube, YouPorn, SpankWire: HubTraffic API deprecated
+// PornCom: API no longer available
+
 
 const ID = 'porn_id'
 const SORT_PROP_PREFIX = 'popularities.porn.'
-const CACHE_PREFIX = 'stremio-porn|'
+const CACHE_PREFIX = 'goonhub|'
 // Making multiple requests to multiple adapters for different types
 // and then aggregating them is a lot of work,
 // so we only support 1 adapter per request for now.
 const MAX_ADAPTERS_PER_REQUEST = 1
-const ADAPTERS = [PornHub, RedTube, YouPorn, SpankWire, PornCom, Chaturbate]
-const SORTS = ADAPTERS.map(({ name, DISPLAY_NAME, SUPPORTED_TYPES }) => ({
-  name: `Porn: ${DISPLAY_NAME}`,
-  prop: `${SORT_PROP_PREFIX}${name}`,
-  types: SUPPORTED_TYPES,
-}))
+const BASE_ADAPTERS = [
+  PornHub, XVideos, XHamster, Chaturbate,
+]
+const isUsenetAdapter = (adapter, includeClass = false) => {
+  return adapter instanceof UsenetStreamer ||
+    (includeClass && adapter === UsenetStreamer)
+}
+function buildSorts(adapters) {
+  return adapters.map(({ name, DISPLAY_NAME, SUPPORTED_TYPES }) => ({
+    name: `Porn: ${DISPLAY_NAME}`,
+    prop: `${SORT_PROP_PREFIX}${name}`,
+    types: SUPPORTED_TYPES,
+  }))
+}
+
+function buildCatalogs(adapters) {
+  return adapters.reduce((catalogs, Adapter) => {
+    if (isUsenetAdapter(Adapter, true)) {
+      return catalogs
+    }
+
+    Adapter.SUPPORTED_TYPES.forEach((type) => {
+      catalogs.push({
+        type,
+        id: `${Adapter.name.toLowerCase()}-${type}`,
+        name: Adapter.DISPLAY_NAME,
+        extra: [{
+          name: 'search',
+        }, {
+          name: 'skip',
+        }, {
+          name: 'genre',
+          isRequired: false,
+        }],
+        extraSupported: ['search', 'skip', 'genre'],
+      })
+    })
+
+    return catalogs
+  }, [])
+}
+
+const SEARCH_CATALOG_PREFIX = 'goonhub-search-'
+
+function buildSearchCatalogs(adapters) {
+  let types = new Set()
+  adapters.forEach((Adapter) => {
+    if (!isUsenetAdapter(Adapter, true)) {
+      Adapter.SUPPORTED_TYPES.forEach((type) => types.add(type))
+    }
+  })
+
+  return Array.from(types).map((type) => ({
+    type,
+    id: `${SEARCH_CATALOG_PREFIX}${type}`,
+    name: 'GoonHub Search',
+    extra: [{
+      name: 'search',
+      isRequired: true,
+    }, {
+      name: 'skip',
+    }],
+    extraSupported: ['search', 'skip'],
+  }))
+}
+
 const METHODS = {
   'stream.find': {
     adapterMethod: 'getStreams',
@@ -58,7 +120,12 @@ function makePornId(adapter, type, id) {
 }
 
 function parsePornId(pornId) {
-  let [adapter, type, id] = pornId.split(':').pop().split('-')
+  let str = pornId.split(':').pop()
+  let firstDash = str.indexOf('-')
+  let secondDash = str.indexOf('-', firstDash + 1)
+  let adapter = str.substring(0, firstDash)
+  let type = str.substring(firstDash + 1, secondDash)
+  let id = str.substring(secondDash + 1)
   return { adapter, type, id }
 }
 
@@ -72,6 +139,7 @@ function normalizeRequest(request) {
       .map((p) => p.slice(SORT_PROP_PREFIX.length))
   }
 
+  // Support plain string queries by converting them to name-based search objects
   if (typeof query === 'string') {
     query = { search: query }
   } else if (query) {
@@ -86,12 +154,6 @@ function normalizeRequest(request) {
     if (type && query.type && type !== query.type) {
       throw new Error(
         `Request query and porn_id types do not match (${type}, ${query.type})`
-      )
-    }
-
-    if (adapters.length && !adapters.includes(adapter)) {
-      throw new Error(
-        `Request sort and porn_id adapters do not match (${adapter})`
       )
     }
 
@@ -120,24 +182,66 @@ function mergeResults(results) {
 
 class PornClient {
   static ID = ID
-  static ADAPTERS = ADAPTERS
-  static SORTS = SORTS
+  static SORT_PROP_PREFIX = SORT_PROP_PREFIX
+  static getAdapters(options = {}) {
+    let adapters = [...BASE_ADAPTERS]
+
+    if (options.usenetStreamerUrl) {
+      adapters.push(UsenetStreamer)
+    }
+
+    return adapters
+  }
+
+  static getSorts(options = {}, adapters = this.getAdapters(options)) {
+    return buildSorts(adapters)
+  }
+
+  static getCatalogs(options = {}, adapters = this.getAdapters(options)) {
+    return buildCatalogs(adapters)
+  }
+
+  static getSearchCatalogs(options = {}, adapters = this.getAdapters(options)) {
+    return buildSearchCatalogs(adapters)
+  }
+
+  static SEARCH_CATALOG_PREFIX = SEARCH_CATALOG_PREFIX
+
+  static getIdPrefixes(options = {}, adapters = this.getAdapters(options)) {
+    let prefixes = []
+
+    if (options.usenetStreamerUrl && adapters.some((adapter) => isUsenetAdapter(adapter, true))) {
+      prefixes.push(...UsenetStreamer.ID_PREFIXES)
+    }
+
+    return prefixes
+  }
 
   constructor(options) {
     let httpClient = new HttpClient(options)
-    this.adapters = ADAPTERS.map((Adapter) => new Adapter(httpClient))
+    this.debridClient = new DebridClient(httpClient, {
+      realDebridToken: options.realDebridToken,
+      torboxToken: options.torboxToken,
+    })
+    this.adapterClasses = PornClient.getAdapters(options)
+    this.adapters = this.adapterClasses.map((Adapter) => {
+      let adapterOptions = {}
 
-    if (options.cache === '1') {
+      if (Adapter === UsenetStreamer) {
+        adapterOptions = { baseUrl: options.usenetStreamerUrl }
+      }
+
+      return new Adapter(httpClient, adapterOptions)
+    })
+    this.sorts = buildSorts(this.adapterClasses)
+    this.catalogs = buildCatalogs(this.adapterClasses)
+
+    if (options.cache && options.cache !== '0') {
       this.cache = cacheManager.caching({ store: 'memory' })
-    } else if (options.cache && options.cache !== '0') {
-      this.cache = cacheManager.caching({
-        store: redisStore,
-        url: options.cache,
-      })
     }
   }
 
-  _getAdaptersForRequest(request) {
+  _getAdaptersForRequest(request, adapterMethod) {
     let { query, adapters } = request
     let { type } = query
     let matchingAdapters = this.adapters
@@ -154,30 +258,49 @@ class PornClient {
       })
     }
 
+    if (adapterMethod === 'getStreams') {
+      let usenetAdapter = (query.id && matchingAdapters.find((adapter) => {
+        return isUsenetAdapter(adapter) && adapter.supportsId(query.id)
+      })) || null
+
+      matchingAdapters = usenetAdapter ?
+        [usenetAdapter] :
+        matchingAdapters.filter((adapter) => !isUsenetAdapter(adapter))
+    } else {
+      matchingAdapters = matchingAdapters.filter((adapter) => !isUsenetAdapter(adapter))
+    }
+
     return matchingAdapters.slice(0, MAX_ADAPTERS_PER_REQUEST)
   }
 
   async _invokeAdapterMethod(adapter, method, request, idProp) {
-    let results = await adapter[method](request)
-    return results.map((result) => {
-      return normalizeResult(adapter, result, idProp)
-    })
+    try {
+      let results = await adapter[method](request)
+      if (method === 'getStreams') {
+        results = await this.debridClient.unrestrictStreams(results)
+      }
+      return results.map((result) => {
+        return normalizeResult(adapter, result, idProp)
+      })
+    } catch (err) {
+      return []
+    }
   }
 
   // Aggregate method that dispatches requests to matching adapters
-  async _invokeMethod(methodName, rawRequest, idProp) {
+  async _invokeMethod(adapterMethod, rawRequest, idProp) {
     let request = normalizeRequest(rawRequest)
-    let adapters = this._getAdaptersForRequest(request)
+    let adapters = this._getAdaptersForRequest(request, adapterMethod)
 
     if (!adapters.length) {
-      throw new Error('Couldn\'t find suitable adapters for a request')
+      return []
     }
 
     let results = []
 
     for (let adapter of adapters) {
       let adapterResults = await this._invokeAdapterMethod(
-        adapter, methodName, request, idProp
+        adapter, adapterMethod, request, idProp
       )
       results.push(adapterResults)
     }

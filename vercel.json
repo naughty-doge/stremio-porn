@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "dist/serverless.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "static/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/logo.png",
+      "dest": "/static/logo.png"
+    },
+    {
+      "src": "/bg.jpg",
+      "dest": "/static/bg.jpg"
+    },
+    {
+      "src": "/screenshot_discover.jpg",
+      "dest": "/static/screenshot_discover.jpg"
+    },
+    {
+      "src": "^/$",
+      "dest": "/static/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/dist/serverless.js"
+    }
+  ]
+}

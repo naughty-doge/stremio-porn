@@ -4,10 +4,10 @@ import HttpProxyAgent from 'http-proxy-agent'
 
 
 const DEFAULT_HEADERS = {
-  'user-agent': 'stremio-porn',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
 }
 const DEFAULT_REQUEST_OPTIONS = {
-  timeout: 20000,
+  timeout: 10000,
 }
 
 

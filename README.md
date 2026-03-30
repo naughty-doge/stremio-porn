@@ -1,9 +1,14 @@
 <p align="center">
   <img src="/static/logo.png">
 </p>
-<h1 align="center" style="border: 0">Porn Addon for Stremio</h1>
+<h1 align="center" style="border: 0">GoonHub - Addon for Stremio</h1>
 <p align="center">
   <em>Time to unsheathe your sword!</em>
+</p>
+<p align="center">
+  <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FVarKhir%2Fgoonhub&env=GOONHUB_ID&envDescription=GOONHUB_ID%3A%20Unique%20addon%20identifier.&project-name=goonhub&repository-name=goonhub">
+    <img src="https://vercel.com/button" alt="Deploy with Vercel" />
+  </a>
 </p>
 
 This is a [Stremio](https://www.stremio.com/) addon that provides porn content from various websites:
@@ -15,9 +20,15 @@ This is a [Stremio](https://www.stremio.com/) addon that provides porn content f
 ## Features
 
 - Adds a dedicated tab in Discover for each website
-- Works in Stremio v4 and v3.6
+- Works in Stremio v5, v4 and v3.6
+- Uses the modern `stremio-addon-sdk` for full v5 compatibility
+- Provides Stremio catalogs for all supported porn sites
+- **Deployable on Vercel** — one-click deploy with the button above
+- **Web UI for configuring debrid services** (Real-Debrid, Torbox) — no environment variables needed for debrid tokens
+- Torbox cache availability is checked before unrestricting links for reliable results
+- Optional Usenet streaming passthrough for IMDb/TMDb/TVDB ids (e.g. [UsenetStreamer](https://github.com/Sanket9225/UsenetStreamer))
 - Supports Docker out of the box
-- Caches results in memory or Redis
+- Caches results in memory
 - Limits the number of concurrent requests to avoid overloading the sites
 - Supports HTTPS proxy
 - Configurable via environment variables
@@ -27,13 +38,15 @@ This is a [Stremio](https://www.stremio.com/) addon that provides porn content f
 
 ## Running
 
-The addon is a web server that fetches video streams from the porn sites in response to requests from Stremio clients. It uses environment variables for configuration and includes a handful of npm scripts to run with or without Docker.
+The addon is a web server that fetches video streams from the porn sites in response to requests from Stremio clients. It uses environment variables for server configuration and includes a handful of npm scripts to run with or without Docker.
+
+### Quick Start (Local)
 
 To install and quickly start the addon, do:
 
 ```bash
-git clone https://github.com/naughty-doge/stremio-porn
-cd stremio-porn
+git clone https://github.com/VarKhir/goonhub
+cd goonhub
 yarn # or `npm install`
 yarn start # or `npm start`
 ```
@@ -42,10 +55,31 @@ By default the server starts on `localhost:80` in development mode and doesn't a
 
 In order for the addon to work publicly, the following environment variables must be set:
 - `NODE_ENV` to `production`
-- `STREMIO_PORN_ENDPOINT` to a public URL of the server
-- `STREMIO_PORN_ID` to a non-default value
+- `GOONHUB_ENDPOINT` to a public URL of the server
+- `GOONHUB_ID` to a non-default value
 
-Note: since this addon scrapes pages, it is recommended to run it behind a proxy and use Redis caching.
+Note: since this addon scrapes pages, it is recommended to run it behind a proxy.
+
+### Deploy to Vercel
+
+Click the **Deploy with Vercel** button at the top of this README, or deploy manually:
+
+1. Fork this repository
+2. Import the project in [Vercel](https://vercel.com/new)
+3. Set the required environment variable (`GOONHUB_ID`)
+4. Deploy
+
+The addon exposes a serverless function at the root URL. The endpoint URL is automatically detected from Vercel's `VERCEL_URL` environment variable — no need to set `GOONHUB_ENDPOINT` manually.
+
+
+## Debrid Services
+
+Debrid services (Real-Debrid and Torbox) can be configured directly from the web UI — no environment variables needed. Open the addon's landing page in a browser, enter your API tokens, and click **"Update Install URL"**. A personalized addon URL is generated with your tokens encoded in it. Use that URL to install the addon in Stremio.
+
+- **Real-Debrid**: Get your API token from [real-debrid.com/apitoken](https://real-debrid.com/apitoken). Streams are unrestricted via the Real-Debrid API.
+- **Torbox**: Get your API token from [torbox.app/settings](https://torbox.app/settings). Before unrestricting, the addon checks Torbox's cache availability endpoint to ensure only cached (reliable) results are returned.
+
+Your tokens are encoded in the addon URL (base64) and are only sent to this addon server when Stremio makes requests.
 
 
 ## Development
@@ -62,11 +96,12 @@ Each of these scripts can be used with `yarn <script>` or `npm run <script>`:
 - `dev` sets `NODE_ENV` to `development` and launches the addon with node inspector activated
 - `test` to run tests with Jest
 - `build` builds the addon in the `dist` dir (add `-w` to watch)
+- `vercel-build` builds the addon for Vercel deployment
 
 * `docker-build` builds the Docker image
-* `docker-start` launches the addon in a `stremio-porn` Docker container
-* `docker-dev` sets `NODE_ENV` to `development` and launches the addon in a `stremio-porn` Docker container
-* `docker-prod` sets `NODE_ENV` to `production` and launches the addon in a `stremio-porn` Docker container
+* `docker-start` launches the addon in a `goonhub` Docker container
+* `docker-dev` sets `NODE_ENV` to `development` and launches the addon in a `goonhub` Docker container
+* `docker-prod` sets `NODE_ENV` to `production` and launches the addon in a `goonhub` Docker container
 * `docker-stop` stops the Docker container
 
 When run in Docker using these scripts, the variables from the current shell are passed to the Docker container.
@@ -74,23 +109,30 @@ When run in Docker using these scripts, the variables from the current shell are
 
 ## Configuration
 
-To configure the addon, set the following environment variables before running it:
+The addon uses environment variables for **server-level** settings. Debrid service tokens are configured per-user via the web UI (see above).
 
-- `NODE_ENV` — when set to `production`, the addon will announce its endpoint to the Stremio addon tracker
-- `STREMIO_PORN_ID` — addon identifier, must be non-default in production mode (defaults to `stremio_porn`)
-- `STREMIO_PORN_ENDPOINT` — base URL to use as the endpoint, must be public in production mode (defaults to `http://localhost`)
-- `STREMIO_PORN_PORT` — port to listen to (defaults to `80`)
-- `STREMIO_PORN_EMAIL` — email address that can be used to contact you (unset by default)
-- `STREMIO_PORN_PROXY` — HTTPS proxy address to route all the outbound requests to (unset by default)
-- `STREMIO_PORN_CACHE` — 0 to turn caching off, 1 to cache in memory, or a Redis URL (e.g. `redis://example.com:6379`) to cache in Redis (defaults to 1)
+### Server Environment Variables
 
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NODE_ENV` | — | Set to `production` to announce the addon to the Stremio tracker |
+| `GOONHUB_ID` | `goonhub` | Addon identifier. Must be changed from the default in production mode |
+| `GOONHUB_ENDPOINT` | `http://localhost` | Public base URL of the server. Auto-detected on Vercel via `VERCEL_URL` |
+| `GOONHUB_PORT` | `80` | Port the server listens on |
+| `GOONHUB_EMAIL` | — | Contact email address shown in the addon manifest |
+| `GOONHUB_PROXY` | — | HTTPS proxy address to route all outbound requests through |
+| `GOONHUB_CACHE` | `1` | Caching mode: `0` = disabled, `1` = in-memory cache |
+| `GOONHUB_USENET_STREAMER` | — | Base URL to a Usenet streaming addon for IMDb/TMDb/TVDB id passthrough |
 
-The addon also respects environment variables commonly used by many hosting providers (e.g. Heroku):
+### Hosting Provider Fallbacks
 
-- `PORT` — fallback for `STREMIO_PORN_PORT`
-- `EMAIL` — fallback for `STREMIO_PORN_EMAIL`
-- `HTTPS_PROXY` — fallback for `STREMIO_PORN_PROXY`
-- `REDIS_URL` — fallback for `STREMIO_PORN_CACHE`
+These common environment variables are used as fallbacks when the `GOONHUB_*` equivalents are not set:
+
+| Variable | Fallback for |
+|----------|-------------|
+| `PORT` | `GOONHUB_PORT` |
+| `EMAIL` | `GOONHUB_EMAIL` |
+| `HTTPS_PROXY` | `GOONHUB_PROXY` |
 
 
 ## Screenshots

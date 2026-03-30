@@ -1,0 +1,25 @@
+services:
+  goonhub:
+    image: ghcr.io/varkhir/goonhub:latest
+    build: .
+    container_name: goonhub
+    restart: unless-stopped
+    ports:
+      - "${GOONHUB_PORT:-8080}:${GOONHUB_PORT:-8080}"
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - GOONHUB_ID=${GOONHUB_ID:-goonhub}
+      - GOONHUB_ENDPOINT=${GOONHUB_ENDPOINT:-http://localhost:8080}
+      - GOONHUB_PORT=${GOONHUB_PORT:-8080}
+      - GOONHUB_EMAIL=${GOONHUB_EMAIL:-}
+      - GOONHUB_PROXY=${GOONHUB_PROXY:-}
+      - GOONHUB_CACHE=${GOONHUB_CACHE:-1}
+      - GOONHUB_USENET_STREAMER=${GOONHUB_USENET_STREAMER:-}
+      - GOONHUB_REAL_DEBRID_TOKEN=${GOONHUB_REAL_DEBRID_TOKEN:-}
+      - GOONHUB_TORBOX_TOKEN=${GOONHUB_TORBOX_TOKEN:-}
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:${GOONHUB_PORT:-8080}/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

@@ -73,6 +73,7 @@ class HubTrafficAdapter extends BaseAdapter {
           url.searchParams.set(name, params[name])
         }
       })
+      url = url.toString()
     }
 
     let { body } = await this.httpClient.request(url, options)
@@ -126,7 +127,7 @@ class HubTrafficAdapter extends BaseAdapter {
     let { body } = await this.httpClient.request(url)
 
     let streams = this._extractStreamsFromEmbed(body)
-    return streams && streams.map((stream) => {
+    return (streams || []).map((stream) => {
       stream.id = id
       return stream
     })

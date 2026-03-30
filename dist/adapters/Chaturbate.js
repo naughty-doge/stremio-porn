@@ -11,8 +11,6 @@ var _BaseAdapter = _interopRequireDefault(require("./BaseAdapter"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
-
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -93,68 +91,56 @@ class Chaturbate extends _BaseAdapter.default {
     };
   }
 
-  _findByPage(query, page) {
-    var _this = this;
-
-    return _asyncToGenerator(function* () {
-      let options = {
-        query: {
-          page,
-          keywords: query.search
-        }
-      };
-      let url = query.genre ? `${BASE_URL}/tag/${query.genre}` : BASE_URL;
-      let {
-        body
-      } = yield _this.httpClient.request(url, options);
-      return _this._parseListPage(body);
-    })();
-  }
-
-  _getItem(type, id) {
-    var _this2 = this;
-
-    return _asyncToGenerator(function* () {
-      let url = `${BASE_URL}/${id}`;
-      let {
-        body
-      } = yield _this2.httpClient.request(url);
-      return _this2._parseItemPage(body);
-    })();
-  }
-
-  _getStreams(type, id) {
-    var _this3 = this;
-
-    return _asyncToGenerator(function* () {
-      let options = {
-        form: true,
-        json: true,
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-Requested-With': 'XMLHttpRequest',
-          Referer: `${BASE_URL}/${id}`
-        },
-        body: {
-          /* eslint-disable-next-line camelcase */
-          room_slug: id,
-          bandwidth: 'high'
-        }
-      };
-      let {
-        body
-      } = yield _this3.httpClient.request(GET_STREAM_URL, options);
-
-      if (body.success && body.room_status === 'public') {
-        return [{
-          id,
-          url: body.url
-        }];
-      } else {
-        return [];
+  async _findByPage(query, page) {
+    let options = {
+      query: {
+        page,
+        keywords: query.search
       }
-    })();
+    };
+    let url = query.genre ? `${BASE_URL}/tag/${query.genre}` : BASE_URL;
+    let {
+      body
+    } = await this.httpClient.request(url, options);
+    return this._parseListPage(body);
+  }
+
+  async _getItem(type, id) {
+    let url = `${BASE_URL}/${id}`;
+    let {
+      body
+    } = await this.httpClient.request(url);
+    return this._parseItemPage(body);
+  }
+
+  async _getStreams(type, id) {
+    let options = {
+      form: true,
+      json: true,
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Requested-With': 'XMLHttpRequest',
+        Referer: `${BASE_URL}/${id}`
+      },
+      body: {
+        /* eslint-disable-next-line camelcase */
+        room_slug: id,
+        bandwidth: 'high'
+      }
+    };
+    let {
+      body
+    } = await this.httpClient.request(GET_STREAM_URL, options);
+
+    if (body.success && body.room_status === 'public') {
+      return [{
+        id,
+        url: body.url
+      }];
+    } else {
+      return [];
+    }
   }
 
 }

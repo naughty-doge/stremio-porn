@@ -13,8 +13,6 @@ var _BaseAdapter = _interopRequireDefault(require("./BaseAdapter"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
-
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 const BASE_URL = 'https://www.eporner.com';
@@ -145,63 +143,51 @@ class EPorner extends _BaseAdapter.default {
     };
   }
 
-  _find(query, {
+  async _find(query, {
     skip,
     limit
   }) {
-    var _this = this;
+    let url = this._makeApiUrl(query, skip, limit);
 
-    return _asyncToGenerator(function* () {
-      let url = _this._makeApiUrl(query, skip, limit);
-
-      let {
-        body
-      } = yield _this.httpClient.request(url);
-      return _this._parseApiResponse(body);
-    })();
+    let {
+      body
+    } = await this.httpClient.request(url);
+    return this._parseApiResponse(body);
   }
 
-  _getItem(type, id) {
-    var _this2 = this;
+  async _getItem(type, id) {
+    let url = this._makeMovieUrl(id);
 
-    return _asyncToGenerator(function* () {
-      let url = _this2._makeMovieUrl(id);
-
-      let {
-        body
-      } = yield _this2.httpClient.request(url);
-      return _this2._parseMoviePage(body);
-    })();
+    let {
+      body
+    } = await this.httpClient.request(url);
+    return this._parseMoviePage(body);
   }
 
-  _getStreams(type, id) {
-    var _this3 = this;
+  async _getStreams(type, id) {
+    // Video downloads are restricted to 30 per day per guest
+    let url = this._makeMovieUrl(id);
 
-    return _asyncToGenerator(function* () {
-      // Video downloads are restricted to 30 per day per guest
-      let url = _this3._makeMovieUrl(id);
+    let {
+      body
+    } = await this.httpClient.request(url);
 
-      let {
-        body
-      } = yield _this3.httpClient.request(url);
+    let {
+      downloadUrls
+    } = this._parseMoviePage(body);
 
-      let {
-        downloadUrls
-      } = _this3._parseMoviePage(body);
-
-      let streamUrls = downloadUrls.map(url => {
-        return _this3.httpClient.request(url, {
-          followRedirect: false
-        });
+    let streamUrls = downloadUrls.map(url => {
+      return this.httpClient.request(url, {
+        followRedirect: false
       });
-      streamUrls = yield Promise.all(streamUrls);
-      return streamUrls.map(res => {
-        return {
-          id,
-          url: res.headers.location
-        };
-      }).filter(stream => stream.url);
-    })();
+    });
+    streamUrls = await Promise.all(streamUrls);
+    return streamUrls.map(res => {
+      return {
+        id,
+        url: res.headers.location
+      };
+    }).filter(stream => stream.url);
   }
 
 }

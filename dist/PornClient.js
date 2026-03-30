@@ -7,25 +7,21 @@ exports.default = void 0;
 
 var _cacheManager = _interopRequireDefault(require("cache-manager"));
 
-var _cacheManagerRedisStore = _interopRequireDefault(require("cache-manager-redis-store"));
-
 var _HttpClient = _interopRequireDefault(require("./HttpClient"));
+
+var _DebridClient = _interopRequireDefault(require("./DebridClient"));
 
 var _PornHub = _interopRequireDefault(require("./adapters/PornHub"));
 
-var _RedTube = _interopRequireDefault(require("./adapters/RedTube"));
+var _XVideos = _interopRequireDefault(require("./adapters/XVideos"));
 
-var _YouPorn = _interopRequireDefault(require("./adapters/YouPorn"));
-
-var _SpankWire = _interopRequireDefault(require("./adapters/SpankWire"));
-
-var _PornCom = _interopRequireDefault(require("./adapters/PornCom"));
+var _XHamster = _interopRequireDefault(require("./adapters/XHamster"));
 
 var _Chaturbate = _interopRequireDefault(require("./adapters/Chaturbate"));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _UsenetStreamer = _interopRequireDefault(require("./adapters/UsenetStreamer"));
 
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
@@ -33,23 +29,82 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 // EPorner has restricted video downloads to 30 per day per guest
 // import EPorner from './adapters/EPorner'
+// RedTube, YouPorn, SpankWire: HubTraffic API deprecated
+// PornCom: API no longer available
 const ID = 'porn_id';
 const SORT_PROP_PREFIX = 'popularities.porn.';
-const CACHE_PREFIX = 'stremio-porn|'; // Making multiple requests to multiple adapters for different types
+const CACHE_PREFIX = 'goonhub|'; // Making multiple requests to multiple adapters for different types
 // and then aggregating them is a lot of work,
 // so we only support 1 adapter per request for now.
 
 const MAX_ADAPTERS_PER_REQUEST = 1;
-const ADAPTERS = [_PornHub.default, _RedTube.default, _YouPorn.default, _SpankWire.default, _PornCom.default, _Chaturbate.default];
-const SORTS = ADAPTERS.map(({
-  name,
-  DISPLAY_NAME,
-  SUPPORTED_TYPES
-}) => ({
-  name: `Porn: ${DISPLAY_NAME}`,
-  prop: `${SORT_PROP_PREFIX}${name}`,
-  types: SUPPORTED_TYPES
-}));
+const BASE_ADAPTERS = [_PornHub.default, _XVideos.default, _XHamster.default, _Chaturbate.default];
+
+const isUsenetAdapter = (adapter, includeClass = false) => {
+  return adapter instanceof _UsenetStreamer.default || includeClass && adapter === _UsenetStreamer.default;
+};
+
+function buildSorts(adapters) {
+  return adapters.map(({
+    name,
+    DISPLAY_NAME,
+    SUPPORTED_TYPES
+  }) => ({
+    name: `Porn: ${DISPLAY_NAME}`,
+    prop: `${SORT_PROP_PREFIX}${name}`,
+    types: SUPPORTED_TYPES
+  }));
+}
+
+function buildCatalogs(adapters) {
+  return adapters.reduce((catalogs, Adapter) => {
+    if (isUsenetAdapter(Adapter, true)) {
+      return catalogs;
+    }
+
+    Adapter.SUPPORTED_TYPES.forEach(type => {
+      catalogs.push({
+        type,
+        id: `${Adapter.name.toLowerCase()}-${type}`,
+        name: Adapter.DISPLAY_NAME,
+        extra: [{
+          name: 'search'
+        }, {
+          name: 'skip'
+        }, {
+          name: 'genre',
+          isRequired: false
+        }],
+        extraSupported: ['search', 'skip', 'genre']
+      });
+    });
+    return catalogs;
+  }, []);
+}
+
+const SEARCH_CATALOG_PREFIX = 'goonhub-search-';
+
+function buildSearchCatalogs(adapters) {
+  let types = new Set();
+  adapters.forEach(Adapter => {
+    if (!isUsenetAdapter(Adapter, true)) {
+      Adapter.SUPPORTED_TYPES.forEach(type => types.add(type));
+    }
+  });
+  return Array.from(types).map(type => ({
+    type,
+    id: `${SEARCH_CATALOG_PREFIX}${type}`,
+    name: 'GoonHub Search',
+    extra: [{
+      name: 'search',
+      isRequired: true
+    }, {
+      name: 'skip'
+    }],
+    extraSupported: ['search', 'skip']
+  }));
+}
+
 const METHODS = {
   'stream.find': {
     adapterMethod: 'getStreams',
@@ -82,7 +137,12 @@ function makePornId(adapter, type, id) {
 }
 
 function parsePornId(pornId) {
-  let [adapter, type, id] = pornId.split(':').pop().split('-');
+  let str = pornId.split(':').pop();
+  let firstDash = str.indexOf('-');
+  let secondDash = str.indexOf('-', firstDash + 1);
+  let adapter = str.substring(0, firstDash);
+  let type = str.substring(firstDash + 1, secondDash);
+  let id = str.substring(secondDash + 1);
   return {
     adapter,
     type,
@@ -101,7 +161,8 @@ function normalizeRequest(request) {
 
   if (sort) {
     adapters = Object.keys(sort).filter(p => p.startsWith(SORT_PROP_PREFIX)).map(p => p.slice(SORT_PROP_PREFIX.length));
-  }
+  } // Support plain string queries by converting them to name-based search objects
+
 
   if (typeof query === 'string') {
     query = {
@@ -122,10 +183,6 @@ function normalizeRequest(request) {
 
     if (type && query.type && type !== query.type) {
       throw new Error(`Request query and porn_id types do not match (${type}, ${query.type})`);
-    }
-
-    if (adapters.length && !adapters.includes(adapter)) {
-      throw new Error(`Request sort and porn_id adapters do not match (${adapter})`);
     }
 
     adapters = [adapter];
@@ -157,23 +214,67 @@ function mergeResults(results) {
 }
 
 class PornClient {
+  static getAdapters(options = {}) {
+    let adapters = [...BASE_ADAPTERS];
+
+    if (options.usenetStreamerUrl) {
+      adapters.push(_UsenetStreamer.default);
+    }
+
+    return adapters;
+  }
+
+  static getSorts(options = {}, adapters = this.getAdapters(options)) {
+    return buildSorts(adapters);
+  }
+
+  static getCatalogs(options = {}, adapters = this.getAdapters(options)) {
+    return buildCatalogs(adapters);
+  }
+
+  static getSearchCatalogs(options = {}, adapters = this.getAdapters(options)) {
+    return buildSearchCatalogs(adapters);
+  }
+
+  static getIdPrefixes(options = {}, adapters = this.getAdapters(options)) {
+    let prefixes = [];
+
+    if (options.usenetStreamerUrl && adapters.some(adapter => isUsenetAdapter(adapter, true))) {
+      prefixes.push(..._UsenetStreamer.default.ID_PREFIXES);
+    }
+
+    return prefixes;
+  }
+
   constructor(options) {
     let httpClient = new _HttpClient.default(options);
-    this.adapters = ADAPTERS.map(Adapter => new Adapter(httpClient));
+    this.debridClient = new _DebridClient.default(httpClient, {
+      realDebridToken: options.realDebridToken,
+      torboxToken: options.torboxToken
+    });
+    this.adapterClasses = PornClient.getAdapters(options);
+    this.adapters = this.adapterClasses.map(Adapter => {
+      let adapterOptions = {};
 
-    if (options.cache === '1') {
+      if (Adapter === _UsenetStreamer.default) {
+        adapterOptions = {
+          baseUrl: options.usenetStreamerUrl
+        };
+      }
+
+      return new Adapter(httpClient, adapterOptions);
+    });
+    this.sorts = buildSorts(this.adapterClasses);
+    this.catalogs = buildCatalogs(this.adapterClasses);
+
+    if (options.cache && options.cache !== '0') {
       this.cache = _cacheManager.default.caching({
         store: 'memory'
-      });
-    } else if (options.cache && options.cache !== '0') {
-      this.cache = _cacheManager.default.caching({
-        store: _cacheManagerRedisStore.default,
-        url: options.cache
       });
     }
   }
 
-  _getAdaptersForRequest(request) {
+  _getAdaptersForRequest(request, adapterMethod) {
     let {
       query,
       adapters
@@ -195,84 +296,84 @@ class PornClient {
       });
     }
 
+    if (adapterMethod === 'getStreams') {
+      let usenetAdapter = query.id && matchingAdapters.find(adapter => {
+        return isUsenetAdapter(adapter) && adapter.supportsId(query.id);
+      }) || null;
+      matchingAdapters = usenetAdapter ? [usenetAdapter] : matchingAdapters.filter(adapter => !isUsenetAdapter(adapter));
+    } else {
+      matchingAdapters = matchingAdapters.filter(adapter => !isUsenetAdapter(adapter));
+    }
+
     return matchingAdapters.slice(0, MAX_ADAPTERS_PER_REQUEST);
   }
 
-  _invokeAdapterMethod(adapter, method, request, idProp) {
-    return _asyncToGenerator(function* () {
-      let results = yield adapter[method](request);
+  async _invokeAdapterMethod(adapter, method, request, idProp) {
+    try {
+      let results = await adapter[method](request);
+
+      if (method === 'getStreams') {
+        results = await this.debridClient.unrestrictStreams(results);
+      }
+
       return results.map(result => {
         return normalizeResult(adapter, result, idProp);
       });
-    })();
+    } catch (err) {
+      return [];
+    }
   } // Aggregate method that dispatches requests to matching adapters
 
 
-  _invokeMethod(methodName, rawRequest, idProp) {
-    var _this = this;
+  async _invokeMethod(adapterMethod, rawRequest, idProp) {
+    let request = normalizeRequest(rawRequest);
 
-    return _asyncToGenerator(function* () {
-      let request = normalizeRequest(rawRequest);
+    let adapters = this._getAdaptersForRequest(request, adapterMethod);
 
-      let adapters = _this._getAdaptersForRequest(request);
+    if (!adapters.length) {
+      return [];
+    }
 
-      if (!adapters.length) {
-        throw new Error('Couldn\'t find suitable adapters for a request');
-      }
+    let results = [];
 
-      let results = [];
+    for (let adapter of adapters) {
+      let adapterResults = await this._invokeAdapterMethod(adapter, adapterMethod, request, idProp);
+      results.push(adapterResults);
+    }
 
-      for (let adapter of adapters) {
-        let adapterResults = yield _this._invokeAdapterMethod(adapter, methodName, request, idProp);
-        results.push(adapterResults);
-      }
-
-      return mergeResults(results, request.limit);
-    })();
+    return mergeResults(results, request.limit);
   } // This is a public wrapper around the private method
   // that implements caching and result normalization
 
 
-  invokeMethod(methodName, rawRequest) {
-    var _this2 = this;
+  async invokeMethod(methodName, rawRequest) {
+    let {
+      adapterMethod,
+      cacheTtl,
+      idProp,
+      expectsArray
+    } = METHODS[methodName];
 
-    return _asyncToGenerator(function* () {
-      let {
-        adapterMethod,
-        cacheTtl,
-        idProp,
-        expectsArray
-      } = METHODS[methodName];
+    let invokeMethod = async () => {
+      let result = await this._invokeMethod(adapterMethod, rawRequest, idProp);
+      result = expectsArray ? result : result[0];
+      return result;
+    };
 
-      let invokeMethod =
-      /*#__PURE__*/
-      function () {
-        var _ref = _asyncToGenerator(function* () {
-          let result = yield _this2._invokeMethod(adapterMethod, rawRequest, idProp);
-          result = expectsArray ? result : result[0];
-          return result;
-        });
-
-        return function invokeMethod() {
-          return _ref.apply(this, arguments);
-        };
-      }();
-
-      if (_this2.cache) {
-        let cacheKey = CACHE_PREFIX + JSON.stringify(rawRequest);
-        let cacheOptions = {
-          ttl: cacheTtl
-        };
-        return _this2.cache.wrap(cacheKey, invokeMethod, cacheOptions);
-      } else {
-        return invokeMethod();
-      }
-    })();
+    if (this.cache) {
+      let cacheKey = CACHE_PREFIX + JSON.stringify(rawRequest);
+      let cacheOptions = {
+        ttl: cacheTtl
+      };
+      return this.cache.wrap(cacheKey, invokeMethod, cacheOptions);
+    } else {
+      return invokeMethod();
+    }
   }
 
 }
 
-_defineProperty(_defineProperty(_defineProperty(PornClient, "ID", ID), "ADAPTERS", ADAPTERS), "SORTS", SORTS);
+_defineProperty(_defineProperty(_defineProperty(PornClient, "ID", ID), "SORT_PROP_PREFIX", SORT_PROP_PREFIX), "SEARCH_CATALOG_PREFIX", SEARCH_CATALOG_PREFIX);
 
 var _default = PornClient;
 exports.default = _default;

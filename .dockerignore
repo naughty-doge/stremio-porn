@@ -1,4 +1,14 @@
-./**
+# Ignore everything
+.*
+node_modules
+src
+tests
+wip
+*.md
+*.log
+docker-compose.yml
+
+# Include only what's needed
 !dist/**
 !static/**
 !package.json

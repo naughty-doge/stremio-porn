@@ -9,7 +9,7 @@ function testAdapter(AdapterClass, items = []) {
 
     beforeEach(() => {
       let httpClient = new HttpClient({
-        proxy: process.env.STREMIO_PORN_PROXY,
+        proxy: process.env.GOONHUB_PROXY,
       })
       adapter = new AdapterClass(httpClient)
     })

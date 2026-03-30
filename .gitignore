@@ -7,3 +7,4 @@ Thumbs.db
 .vscode
 *.log
 .npmrc
+package-lock.json

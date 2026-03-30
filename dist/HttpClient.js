@@ -18,10 +18,10 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 const DEFAULT_HEADERS = {
-  'user-agent': 'stremio-porn'
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 };
 const DEFAULT_REQUEST_OPTIONS = {
-  timeout: 20000
+  timeout: 10000
 };
 
 class HttpClient {
