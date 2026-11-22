@@ -55,7 +55,7 @@ class Chaturbate extends BaseAdapter {
       let viewers = $item.find('.cams').text().match(/(\d+) viewers/i)
       viewers = viewers && Number(viewers[1])
       return { id, url, subject, poster, tags, viewers }
-    }).toArray()
+    }).toArray().filter((item) => item.id)
   }
 
   _parseItemPage(body) {
