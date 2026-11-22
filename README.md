@@ -38,7 +38,7 @@ yarn # or `npm install`
 yarn start # or `npm start`
 ```
 
-By default the server starts on `localhost:80` in development mode and doesn't announce itself to the Stremio addon tracker. To add the addon to Stremio, open its endpoint in the browser and click the Install button, or enter the URL in the app's Addons section.
+By default the server starts on `localhost:80` in development mode. To add the addon to Stremio, open its endpoint in the browser and click the Install button, or enter the manifest URL (`http://localhost/manifest.json` by default) in the app's Addons section.
 
 In order for the addon to work publicly, the following environment variables must be set:
 - `NODE_ENV` to `production`
@@ -76,7 +76,7 @@ When run in Docker using these scripts, the variables from the current shell are
 
 To configure the addon, set the following environment variables before running it:
 
-- `NODE_ENV` — when set to `production`, the addon will announce its endpoint to the Stremio addon tracker
+- `NODE_ENV` — when set to `production`, the addon refuses to start with the default identifier
 - `STREMIO_PORN_ID` — addon identifier, must be non-default in production mode (defaults to `stremio_porn`)
 - `STREMIO_PORN_ENDPOINT` — base URL to use as the endpoint, must be public in production mode (defaults to `http://localhost`)
 - `STREMIO_PORN_PORT` — port to listen to (defaults to `80`)

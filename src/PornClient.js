@@ -120,6 +120,7 @@ function mergeResults(results) {
 
 class PornClient {
   static ID = ID
+  static SORT_PROP_PREFIX = SORT_PROP_PREFIX
   static ADAPTERS = ADAPTERS
   static SORTS = SORTS
 
