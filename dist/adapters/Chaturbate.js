@@ -72,7 +72,7 @@ class Chaturbate extends _BaseAdapter.default {
         tags,
         viewers
       };
-    }).toArray();
+    }).toArray().filter(item => item.id);
   }
 
   _parseItemPage(body) {

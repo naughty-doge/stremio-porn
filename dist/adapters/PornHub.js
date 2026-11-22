@@ -28,7 +28,7 @@ class PornHub extends _HubTrafficAdapter.default {
     /* eslint-disable max-len */
     // URL example:
     // https:\/\/de.phncdn.com\/videos\/201503\/28\/46795732\/vl_480_493k_46795732.mp4?ttl=1522227092&ri=1228800&rs=696&hash=268b5f4d76927209ef554ac9e93c6c85
-    let regexp = /videoUrl["']?\s*:\s*["']?(https?:\\?\/\\?\/[a-z]+\.phncdn\.com[^"']+)/gi;
+    let regexp = /videoUrl["']?\s*:\s*["']?(https?:\\?\/\\?\/[a-z0-9_-]+\.phncdn\.com[^"']+)/gi;
     /* eslint-enable max-len */
 
     let urlMatches = regexp.exec(body);

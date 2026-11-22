@@ -28,7 +28,7 @@ class YouPorn extends _HubTrafficAdapter.default {
     /* eslint-disable max-len */
     // URL example:
     // https:\/\/ee.ypncdn.com\/201709\/01\/14062051\/720p_1500k_14062051\/YouPorn_-_mia-khalifa-big-tits-arab-pornstar-takes-a-fan-s-virginity.mp4?rate=193k&burst=1400k&validfrom=1524765800&validto=1524780200&hash=EGRxkAOZwod648gfnITHeyb%2Fzi8%3D
-    let regexp = /videoUrl["']?\s*:\s*["']?(https?:\\?\/\\?\/[a-z]+\.ypncdn\.com[^"']+)/gi;
+    let regexp = /videoUrl["']?\s*:\s*["']?(https?:\\?\/\\?\/[a-z0-9_-]+\.ypncdn\.com[^"']+)/gi;
     /* eslint-enable max-len */
 
     let urlMatches = body.match(regexp);

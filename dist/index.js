@@ -7,7 +7,7 @@ exports.default = void 0;
 
 var _http = _interopRequireDefault(require("http"));
 
-var _stremioAddons = _interopRequireDefault(require("stremio-addons"));
+var _url = require("url");
 
 var _serveStatic = _interopRequireDefault(require("serve-static"));
 
@@ -21,7 +21,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
 
-const SUPPORTED_METHODS = ['stream.find', 'meta.find', 'meta.search', 'meta.get'];
 const STATIC_DIR = 'static';
 const DEFAULT_ID = 'stremio_porn';
 const ID = process.env.STREMIO_PORN_ID || DEFAULT_ID;
@@ -49,81 +48,272 @@ Time to unsheathe your sword! \
 Watch porn videos and webcam streams from ${availableSites}\
 `,
   types: ['movie', 'tv'],
-  idProperty: _PornClient.default.ID,
-  dontAnnounce: !IS_PROD,
-  sorts: _PornClient.default.SORTS,
-  // The docs mention `contactEmail`, but the template uses `email`
-  email: EMAIL,
+  idPrefixes: [`${_PornClient.default.ID}:`],
+  resources: ['catalog', 'meta', 'stream'],
+  catalogs: _PornClient.default.ADAPTERS.map(Adapter => ({
+    type: Adapter.SUPPORTED_TYPES[0],
+    id: Adapter.name,
+    name: `Porn: ${Adapter.DISPLAY_NAME}`,
+    extra: [{
+      name: 'search'
+    }, {
+      name: 'skip'
+    }, {
+      name: 'genre'
+    }]
+  })),
+  behaviorHints: {
+    adult: true
+  },
   contactEmail: EMAIL,
-  endpoint: `${ENDPOINT}/stremioget/stremio/v1`,
   logo: `${ENDPOINT}/logo.png`,
-  icon: `${ENDPOINT}/logo.png`,
-  background: `${ENDPOINT}/bg.jpg`,
-  // OBSOLETE: used in pre-4.0 stremio instead of idProperty/types
-  filter: {
-    [`query.${_PornClient.default.ID}`]: {
-      $exists: true
-    },
-    'query.type': {
-      $in: ['movie', 'tv']
-    }
-  }
+  background: `${ENDPOINT}/bg.jpg`
 };
-
-function makeMethod(client, methodName) {
-  return (
-    /*#__PURE__*/
-    function () {
-      var _ref = _asyncToGenerator(function* (request, cb) {
-        let response;
-        let error;
-
-        try {
-          response = yield client.invokeMethod(methodName, request);
-        } catch (err) {
-          error = err;
-          /* eslint-disable no-console */
-
-          console.error( // eslint-disable-next-line prefer-template
-          _chalk.default.gray(new Date().toLocaleString()) + ' An error has occurred while processing ' + `the following request to ${methodName}:`);
-          console.error(request);
-          console.error(err);
-          /* eslint-enable no-console */
-        }
-
-        cb(error, response);
-      });
-
-      return function (_x, _x2) {
-        return _ref.apply(this, arguments);
-      };
-    }()
-  );
-}
-
-function makeMethods(client, methodNames) {
-  return methodNames.reduce((methods, methodName) => {
-    methods[methodName] = makeMethod(client, methodName);
-    return methods;
-  }, {});
-}
-
+const CATALOG_RE = /^\/catalog\/([^/]+)\/([^/]+?)(?:\/([^/]+))?\.json$/;
+const META_RE = /^\/meta\/([^/]+)\/(.+)\.json$/;
+const STREAM_RE = /^\/stream\/([^/]+)\/(.+)\.json$/;
 let client = new _PornClient.default({
   proxy: PROXY,
   cache: CACHE
 });
-let methods = makeMethods(client, SUPPORTED_METHODS);
-let addon = new _stremioAddons.default.Server(methods, MANIFEST);
+
+function toMeta(item) {
+  return {
+    id: item.id,
+    type: item.type,
+    name: item.name,
+    poster: item.poster,
+    posterShape: item.posterShape,
+    background: item.banner,
+    description: item.description,
+    genres: item.genre,
+    releaseInfo: item.year,
+    runtime: item.runtime,
+    website: item.website
+  };
+}
+
+function toStream(stream) {
+  return {
+    name: stream.name,
+    title: stream.title,
+    url: stream.url
+  };
+}
+
+function parseExtra(extra) {
+  let params = {};
+
+  if (!extra) {
+    return params;
+  }
+
+  extra.split('&').forEach(pair => {
+    let [key, value] = pair.split('=');
+
+    if (key) {
+      params[decodeURIComponent(key)] = decodeURIComponent(value || '');
+    }
+  });
+  return params;
+}
+
+function sendJson(res, status, body) {
+  let json = JSON.stringify(body);
+  res.writeHead(status, {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Access-Control-Allow-Origin': '*',
+    'Content-Length': Buffer.byteLength(json)
+  });
+  res.end(json);
+}
+
+function handleCatalog(_x, _x2) {
+  return _handleCatalog.apply(this, arguments);
+}
+
+function _handleCatalog() {
+  _handleCatalog = _asyncToGenerator(function* (res, match) {
+    let type = decodeURIComponent(match[1]);
+    let catalogId = decodeURIComponent(match[2]);
+
+    let adapter = _PornClient.default.ADAPTERS.find(a => a.name === catalogId);
+
+    if (!adapter || !adapter.SUPPORTED_TYPES.includes(type)) {
+      return sendJson(res, 404, {
+        error: `Unknown catalog ${catalogId}`
+      });
+    }
+
+    let params = parseExtra(match[3] && decodeURIComponent(match[3]));
+    let metas = yield client.invokeMethod('meta.find', {
+      query: {
+        type,
+        search: params.search,
+        genre: params.genre
+      },
+      sort: {
+        [`${_PornClient.default.SORT_PROP_PREFIX}${adapter.name}`]: -1
+      },
+      skip: Number(params.skip) || 0,
+      limit: 100
+    });
+    return sendJson(res, 200, {
+      metas: metas.map(toMeta)
+    });
+  });
+  return _handleCatalog.apply(this, arguments);
+}
+
+function handleMeta(_x3, _x4) {
+  return _handleMeta.apply(this, arguments);
+}
+
+function _handleMeta() {
+  _handleMeta = _asyncToGenerator(function* (res, match) {
+    let type = decodeURIComponent(match[1]);
+    let id = decodeURIComponent(match[2]);
+    let meta = yield client.invokeMethod('meta.get', {
+      // eslint-disable-next-line camelcase
+      query: {
+        porn_id: id,
+        type
+      }
+    });
+
+    if (!meta) {
+      return sendJson(res, 404, {
+        error: `No meta for ${id}`
+      });
+    }
+
+    return sendJson(res, 200, {
+      meta: toMeta(meta)
+    });
+  });
+  return _handleMeta.apply(this, arguments);
+}
+
+function handleStream(_x5, _x6) {
+  return _handleStream.apply(this, arguments);
+}
+
+function _handleStream() {
+  _handleStream = _asyncToGenerator(function* (res, match) {
+    let type = decodeURIComponent(match[1]);
+    let id = decodeURIComponent(match[2]);
+    let streams = yield client.invokeMethod('stream.find', {
+      // eslint-disable-next-line camelcase
+      query: {
+        porn_id: id,
+        type
+      }
+    });
+    return sendJson(res, 200, {
+      streams: streams.map(toStream)
+    });
+  });
+  return _handleStream.apply(this, arguments);
+}
+
+function handleApi(res, pathname) {
+  if (pathname === '/manifest.json') {
+    return Promise.resolve(sendJson(res, 200, MANIFEST));
+  }
+
+  let match = pathname.match(CATALOG_RE);
+
+  if (match) {
+    return handleCatalog(res, match);
+  }
+
+  match = pathname.match(META_RE);
+
+  if (match) {
+    return handleMeta(res, match);
+  }
+
+  match = pathname.match(STREAM_RE);
+
+  if (match) {
+    return handleStream(res, match);
+  }
+
+  return Promise.resolve(sendJson(res, 404, {
+    error: 'Not found'
+  }));
+}
+
+function landingPage(req, res) {
+  let host = (req.headers.host || 'localhost').replace(/[^\w.:-]/g, '');
+  let html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>${MANIFEST.name} - Stremio Addon</title>
+  <style>
+    body { font-family: sans-serif; background: #1a1a2e; color: white;
+           display: flex; align-items: center; justify-content: center;
+           height: 100vh; margin: 0; }
+    main { text-align: center; max-width: 32em; padding: 1em; }
+    a.button { display: inline-block; margin: 1em 0; padding: .8em 1.6em;
+               background: #7b5bf5; color: white; text-decoration: none;
+               border-radius: 4px; }
+    code { background: #333; padding: .2em .4em; border-radius: 4px;
+           word-break: break-all; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>${MANIFEST.name}</h1>
+    <p>${MANIFEST.description}</p>
+    <a class="button" href="stremio://${host}/manifest.json">Install</a>
+    <p>If the button doesn't work, paste this URL in Stremio &rarr; Addons:</p>
+    <p><code>${ENDPOINT}/manifest.json</code></p>
+  </main>
+</body>
+</html>`;
+  res.writeHead(200, {
+    'Content-Type': 'text/html; charset=utf-8'
+  });
+  res.end(html);
+}
 
 let server = _http.default.createServer((req, res) => {
+  if (req.method === 'OPTIONS') {
+    res.writeHead(200, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Accept',
+      'Access-Control-Max-Age': '86400'
+    });
+    return res.end();
+  }
+
+  if (req.method !== 'GET') {
+    res.writeHead(405);
+    return res.end();
+  }
+
+  let pathname = new _url.URL(req.url, 'http://localhost').pathname;
   (0, _serveStatic.default)(STATIC_DIR)(req, res, () => {
-    addon.middleware(req, res, () => res.end());
+    if (pathname === '/') {
+      return landingPage(req, res);
+    }
+
+    handleApi(res, pathname).catch(err => {
+      // eslint-disable-next-line no-console
+      console.error(_chalk.default.gray(new Date().toLocaleString()), req.url, err);
+      sendJson(res, err instanceof URIError ? 400 : 500, {
+        error: err.message
+      });
+    });
   });
 });
 
 server.on('listening', () => {
   let values = {
-    endpoint: _chalk.default.green(MANIFEST.endpoint),
+    endpoint: _chalk.default.green(`${ENDPOINT}/manifest.json`),
     id: ID === DEFAULT_ID ? _chalk.default.red(ID) : _chalk.default.green(ID),
     email: EMAIL ? _chalk.default.green(EMAIL) : _chalk.default.red('undefined'),
     env: IS_PROD ? _chalk.default.green('production') : _chalk.default.green('development'),

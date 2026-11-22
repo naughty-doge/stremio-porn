@@ -272,7 +272,7 @@ class PornClient {
 
 }
 
-_defineProperty(_defineProperty(_defineProperty(PornClient, "ID", ID), "ADAPTERS", ADAPTERS), "SORTS", SORTS);
+_defineProperty(_defineProperty(_defineProperty(_defineProperty(PornClient, "ID", ID), "SORT_PROP_PREFIX", SORT_PROP_PREFIX), "ADAPTERS", ADAPTERS), "SORTS", SORTS);
 
 var _default = PornClient;
 exports.default = _default;
